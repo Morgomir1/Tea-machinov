@@ -5,98 +5,93 @@
 //  Created by user on 27.11.2025.
 //
 
-
 import SwiftUI
 
-struct ContentView: View {
+struct MainScreen: View {
+    // Параметр для настройки размера шрифта
+    @State private var titleFontSize: CGFloat = 30
+    
     var body: some View {
-        ZStack {
-            // Фон
-            Image("background")
-                .resizable()
-                .scaledToFill()
+        GeometryReader { geometry in
+            ZStack {
+                // Фон
+                Image("main_background")
+                    .resizable()
+                    .scaledToFill()
+                    .edgesIgnoringSafeArea(.all)
+                
+                // Градиентное затемнение снизу
+                LinearGradient(
+                    gradient: Gradient(colors: [
+                        Color.clear,
+                        Color.black.opacity(1.0)
+                    ]),
+                    startPoint: .top,
+                    endPoint: .bottom
+                )
                 .edgesIgnoringSafeArea(.all)
-            
-            VStack {
-                Spacer()
                 
-                // Плашка с контентом
-                VStack(spacing: 20) {
-                    Text("Nike App")
-                        .font(.largeTitle)
-                        .fontWeight(.bold)
-                        .foregroundColor(.black)
+                VStack {
+                    Spacer()
                     
-                    Text("Bringing Nike Members the best products, inspiration and stories in sport.")
-                        .font(.body)
-                        .foregroundColor(.gray)
-                        .multilineTextAlignment(.center)
-                        .padding(.horizontal)
-                    
-                    Button("Join Us") {
-                        // Действие для Join Us
+                    // Плашка с контентом (теперь прозрачная)
+                    VStack(spacing: 0) {
+                        Image("nike_icon")
+                            .resizable()
+                            .aspectRatio(contentMode: .fit)
+                            .frame(width: 233, height: 132)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .offset(x: -69)
+                        
+                        Text("Nike App \nBringing Nike Member\nthe best products,\ninspiration and stories\nin sport.")
+                            .font(.system(size: titleFontSize, weight: .bold))
+                            .foregroundColor(.white)
+                            .multilineTextAlignment(.leading)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .padding(.vertical)
                     }
-                    .font(.headline)
-                    .foregroundColor(.white)
-                    .frame(maxWidth: .infinity)
-                    .frame(height: 50)
-                    .background(Color.black)
-                    .cornerRadius(25)
-                    
-                    Button("Sign In") {
-                        // Действие для Sign In
-                    }
-                    .font(.headline)
-                    .foregroundColor(.black)
-                    .frame(maxWidth: .infinity)
-                    .frame(height: 50)
-                    .background(Color.white)
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 25)
-                            .stroke(Color.black, lineWidth: 2)
-                    )
+                    .padding(10)
+                    .background(Color.clear) // Прозрачный фо
+                    .padding(.bottom, geometry.size.height * 0.25)
                 }
-                .padding(30)
-                .background(Color.white)
-                .cornerRadius(16)
-                .shadow(radius: 10)
-                .padding(.horizontal, 20)
                 
-                Spacer()
-            }
-            
-            // Bottom Sheet
-            VStack {
-                Spacer()
-                BottomSheetView()
+                // Кнопки с позиционированием 15% от нижней границы
+                VStack {
+                    Spacer()
+                    
+                    HStack(spacing: 16) {
+                        // Кнопка Join Us
+                        Button("Join Us") {
+                            // Действие для Join Us
+                        }
+                        .font(.headline)
+                        .foregroundColor(.black)
+                        .frame(width: 158, height: 50)
+                        .background(Color.white)
+                        .cornerRadius(50)
+                        
+                        // Кнопка Sign In
+                        Button("Sign In") {
+                            // Действие для Sign In
+                        }
+                        .font(.headline)
+                        .foregroundColor(.white)
+                        .frame(width: 158, height: 50)
+                        .background(Color.clear)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 50)
+                                .stroke(Color.white, lineWidth: 1)
+                        )
+                    }
+                    .padding(.bottom, geometry.size.height * 0.15)
+                }
+                
+                // Белый индикатор внизу экрана
+                //BottomIndicatorView()
             }
         }
+        // Status bar будет отображаться (это значение по умолчанию)
         .statusBar(hidden: false)
-    }
-}
-
-struct BottomSheetView: View {
-    var body: some View {
-        VStack {
-            // Handle для bottom sheet
-            RoundedRectangle(cornerRadius: 2)
-                .frame(width: 40, height: 4)
-                .foregroundColor(.gray)
-                .padding(.top, 8)
-            
-            Spacer()
-            
-            // Здесь можно добавить контент для bottom sheet
-            Text("Bottom Sheet Content")
-                .foregroundColor(.gray)
-            
-            Spacer()
-        }
-        .frame(height: 200)
-        .frame(maxWidth: .infinity)
-        .background(Color.white)
-        .cornerRadius(20, corners: [.topLeft, .topRight])
-        .shadow(radius: 5)
     }
 }
 
@@ -117,11 +112,6 @@ struct RoundedCorner: Shape {
     }
 }
 
-@main
-struct MyApp: App {
-    var body: some Scene {
-        WindowGroup {
-            ContentView()
-        }
-    }
+#Preview {
+    MainScreen()
 }
