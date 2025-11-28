@@ -1,3 +1,11 @@
+//
+//  ContentView.swift
+//  Tea-machinov
+//
+//  Created by user on 28.11.2025.
+//
+
+
 import SwiftUI
 
 struct ContentView: View {
@@ -41,8 +49,6 @@ struct ContentView: View {
         .accentColor(.blue) // Цвет выбранной вкладки
     }
 }
-
-// MARK: - Views для каждой вкладки
 
 struct HomeView: View {
     var body: some View {
@@ -159,10 +165,6 @@ struct ProfileView: View {
     }
 }
 
-// MARK: - Preview
-
-struct ContentView_Previews: PreviewProvider {
-    static var previews: some View {
-        ContentView()
-    }
+#Preview {
+    ContentView()
 }
