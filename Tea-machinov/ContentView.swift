@@ -5,7 +5,6 @@
 //  Created by user on 28.11.2025.
 //
 
-
 import SwiftUI
 
 struct ContentView: View {
@@ -46,11 +45,13 @@ struct ContentView: View {
                 }
                 .tag(4)
         }
-        .accentColor(.blue) // Цвет выбранной вкладки
+        .accentColor(.blue)
     }
 }
 
 struct HomeView: View {
+    @State private var searchText = ""
+    
     var body: some View {
         NavigationView {
             ZStack {
@@ -69,11 +70,42 @@ struct HomeView: View {
                 }
             }
             .navigationTitle("Home")
+            .toolbar {
+                // Кнопка возврата слева
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button(action: {
+                        // Действие при нажатии кнопки возврата
+                        print("Back button tapped")
+                    }) {
+                        Image(systemName: "chevron.left")
+                            .foregroundColor(.primary)
+                    }
+                }
+                
+                // Поле поиска справа
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    HStack {
+                        TextField("Search...", text: $searchText)
+                            .textFieldStyle(RoundedBorderTextFieldStyle())
+                            .frame(width: 150)
+                        
+                        Button(action: {
+                            // Действие при нажатии на лупу
+                            print("Search for: \(searchText)")
+                        }) {
+                            Image(systemName: "magnifyingglass")
+                                .foregroundColor(.primary)
+                        }
+                    }
+                }
+            }
         }
     }
 }
 
 struct ShopView: View {
+    @State private var searchText = ""
+    
     var body: some View {
         NavigationView {
             ZStack {
@@ -92,11 +124,38 @@ struct ShopView: View {
                 }
             }
             .navigationTitle("Shop")
+            .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button(action: {
+                        print("Back button tapped")
+                    }) {
+                        Image(systemName: "chevron.left")
+                            .foregroundColor(.primary)
+                    }
+                }
+                
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    HStack {
+                        TextField("Search...", text: $searchText)
+                            .textFieldStyle(RoundedBorderTextFieldStyle())
+                            .frame(width: 150)
+                        
+                        Button(action: {
+                            print("Search for: \(searchText)")
+                        }) {
+                            Image(systemName: "magnifyingglass")
+                                .foregroundColor(.primary)
+                        }
+                    }
+                }
+            }
         }
     }
 }
 
 struct FavouritesView: View {
+    @State private var searchText = ""
+    
     var body: some View {
         NavigationView {
             ZStack {
@@ -115,11 +174,38 @@ struct FavouritesView: View {
                 }
             }
             .navigationTitle("Favourites")
+            .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button(action: {
+                        print("Back button tapped")
+                    }) {
+                        Image(systemName: "chevron.left")
+                            .foregroundColor(.primary)
+                    }
+                }
+                
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    HStack {
+                        TextField("Search...", text: $searchText)
+                            .textFieldStyle(RoundedBorderTextFieldStyle())
+                            .frame(width: 150)
+                        
+                        Button(action: {
+                            print("Search for: \(searchText)")
+                        }) {
+                            Image(systemName: "magnifyingglass")
+                                .foregroundColor(.primary)
+                        }
+                    }
+                }
+            }
         }
     }
 }
 
 struct BagView: View {
+    @State private var searchText = ""
+    
     var body: some View {
         NavigationView {
             ZStack {
@@ -138,11 +224,38 @@ struct BagView: View {
                 }
             }
             .navigationTitle("Bag")
+            .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button(action: {
+                        print("Back button tapped")
+                    }) {
+                        Image(systemName: "chevron.left")
+                            .foregroundColor(.primary)
+                    }
+                }
+                
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    HStack {
+                        TextField("Search...", text: $searchText)
+                            .textFieldStyle(RoundedBorderTextFieldStyle())
+                            .frame(width: 150)
+                        
+                        Button(action: {
+                            print("Search for: \(searchText)")
+                        }) {
+                            Image(systemName: "magnifyingglass")
+                                .foregroundColor(.primary)
+                        }
+                    }
+                }
+            }
         }
     }
 }
 
 struct ProfileView: View {
+    @State private var searchText = ""
+    
     var body: some View {
         NavigationView {
             ZStack {
@@ -161,6 +274,31 @@ struct ProfileView: View {
                 }
             }
             .navigationTitle("Profile")
+            .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button(action: {
+                        print("Back button tapped")
+                    }) {
+                        Image(systemName: "chevron.left")
+                            .foregroundColor(.primary)
+                    }
+                }
+                
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    HStack {
+                        TextField("Search...", text: $searchText)
+                            .textFieldStyle(RoundedBorderTextFieldStyle())
+                            .frame(width: 150)
+                        
+                        Button(action: {
+                            print("Search for: \(searchText)")
+                        }) {
+                            Image(systemName: "magnifyingglass")
+                                .foregroundColor(.primary)
+                        }
+                    }
+                }
+            }
         }
     }
 }
