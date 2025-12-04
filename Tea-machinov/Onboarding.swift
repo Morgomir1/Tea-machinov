@@ -1,6 +1,9 @@
 import SwiftUI
 
 struct OnboardingScreen: View {
+    
+    var goToTabs: () -> Void
+    
     var body: some View {
         GeometryReader { geometry in
             ZStack {
@@ -121,7 +124,7 @@ struct OnboardingScreen: View {
                 
                 // Кнопка Get Started
                 Button(action: {
-                    // Действие для кнопки
+                    goToTabs()
                 }) {
                     Text("Get Started")
                         .font(.headline)
@@ -658,5 +661,7 @@ struct Tetka1ImageView: UIViewRepresentable {
 }
 
 #Preview {
-    OnboardingScreen()
+    OnboardingScreen(goToTabs: {
+        
+    })
 }

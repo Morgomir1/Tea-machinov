@@ -11,7 +11,7 @@ import SwiftUI
 struct Tea_machinovApp: App {
     var body: some Scene {
         WindowGroup {
-            MainScreen()
+            ContentView()
         }
     }
 }
