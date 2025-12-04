@@ -17,7 +17,6 @@ struct MainScreen: View {
                 // Фон
                 Image("main_background")
                     .resizable()
-                    .scaledToFill()
                     .edgesIgnoringSafeArea(.all)
                 
                 // Градиентное затемнение снизу
