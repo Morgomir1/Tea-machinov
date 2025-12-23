@@ -16,13 +16,51 @@ struct CategoryView: View {
     let subCategories = ["Socks", "Accessories & Equipment", "Player", "Training"]
     
     var filteredProducts: [Product] {
-        // Фильтруем товары по категории
-        // Пока возвращаем все товары, так как в JSON нет категорий
-        // Можно использовать bestseller для категории "Best Sellers"
+        // Сначала фильтруем по основной категории
+        var products = productService.products
         if categoryName == "Best Sellers" {
-            return productService.getBestsellers()
+            products = productService.getBestsellers()
         }
-        return productService.products
+        
+        // Затем фильтруем по выбранной подкатегории
+        return products.filter { product in
+            matchesSubCategory(product: product, subCategory: selectedSubCategory)
+        }
+    }
+    
+    private func matchesSubCategory(product: Product, subCategory: String) -> Bool {
+        let productName = product.product_name.lowercased()
+        let brand = product.brand.lowercased()
+        let combined = "\(productName) \(brand)".lowercased()
+        
+        switch subCategory {
+        case "Socks":
+            return combined.contains("sock") || 
+                   combined.contains("носки") ||
+                   productName.contains("sock")
+        case "Accessories & Equipment":
+            return combined.contains("backpack") ||
+                   combined.contains("bag") ||
+                   combined.contains("equipment") ||
+                   combined.contains("accessories") ||
+                   combined.contains("аксессуар") ||
+                   combined.contains("рюкзак")
+        case "Player":
+            return combined.contains("player") ||
+                   combined.contains("basketball") ||
+                   combined.contains("jordan") ||
+                   combined.contains("игрок") ||
+                   brand.contains("jordan")
+        case "Training":
+            return combined.contains("training") ||
+                   combined.contains("dri-fit") ||
+                   combined.contains("therma") ||
+                   combined.contains("трениров") ||
+                   productName.contains("training") ||
+                   productName.contains("Training")
+        default:
+            return true
+        }
     }
     
     var body: some View {

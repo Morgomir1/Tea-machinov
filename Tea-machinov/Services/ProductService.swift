@@ -55,6 +55,18 @@ class ProductService: ObservableObject {
         products
     }
     
+    func searchProducts(query: String) -> [Product] {
+        guard !query.isEmpty else {
+            return []
+        }
+        
+        let lowercasedQuery = query.lowercased()
+        return products.filter { product in
+            product.brand.lowercased().contains(lowercasedQuery) ||
+            product.product_name.lowercased().contains(lowercasedQuery)
+        }
+    }
+    
     func toggleLike(for product: Product) {
         if let index = products.firstIndex(where: { $0.id == product.id }) {
             products[index].is_liked.toggle()
