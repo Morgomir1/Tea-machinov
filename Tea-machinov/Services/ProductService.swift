@@ -49,6 +49,16 @@ class ProductService: ObservableObject {
         Array(products.prefix(4))
     }
     
+    func getNewProducts() -> [Product] {
+        // Возвращаем последние товары как новые (предполагаем, что последние добавленные товары - это новые)
+        // Берем последние 20 товаров, которые не являются бестселлерами
+        let nonBestsellers = products.filter { !$0.is_bestseller }
+        if nonBestsellers.count > 20 {
+            return Array(nonBestsellers.suffix(20))
+        }
+        return nonBestsellers
+    }
+    
     func getProductsByCategory(_ category: String) -> [Product] {
         // Пока возвращаем все товары, так как в JSON нет категорий
         // В будущем можно добавить фильтрацию по категориям

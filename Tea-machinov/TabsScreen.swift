@@ -93,7 +93,7 @@ struct HomeView: View {
                         ScrollView(.horizontal, showsIndicators: false) {
                             HStack(spacing: 12) {
                                 ForEach(interestService.selectedInterests) { interest in
-                                    NavigationLink(destination: ShopView(initialCategory: interest.category)) {
+                                    NavigationLink(destination: ShopView(initialCategory: interest.category, showBackButton: true)) {
                                         InterestCard(title: interest.title, imageName: interest.imageName)
                                     }
                                     .buttonStyle(PlainButtonStyle())
@@ -109,12 +109,15 @@ struct HomeView: View {
                     
                     // Промо-баннер с изображением из онбординга
                     VStack(alignment: .leading, spacing: 12) {
-                        PromoBannerCard(
-                            title: "New Collection",
-                            subtitle: "Discover the latest styles",
-                            imageName: "crossovki4",
-                            height: 200
-                        )
+                        NavigationLink(destination: ShopView(showBackButton: true, showNewProductsOnly: true)) {
+                            PromoBannerCard(
+                                title: "New Collection",
+                                subtitle: "Discover the latest styles",
+                                imageName: "crossovki4",
+                                height: 200
+                            )
+                        }
+                        .buttonStyle(PlainButtonStyle())
                         .padding(.horizontal)
                     }
                     .padding(.top, 8)
@@ -157,10 +160,14 @@ struct ShopView: View {
     @StateObject private var productService = ProductService()
     @State private var selectedCategory: String
     let initialCategory: String?
+    let showBackButton: Bool
+    let showNewProductsOnly: Bool
     
-    init(initialCategory: String? = nil) {
+    init(initialCategory: String? = nil, showBackButton: Bool = false, showNewProductsOnly: Bool = false) {
         _selectedCategory = State(initialValue: initialCategory ?? "Men")
         self.initialCategory = initialCategory
+        self.showBackButton = showBackButton
+        self.showNewProductsOnly = showNewProductsOnly
     }
     @State private var selectedBestSellerCategory: String = "Socks"
     @State private var searchText = ""
@@ -175,7 +182,8 @@ struct ShopView: View {
     }
     
     var filteredProductsByCategory: [Product] {
-        productService.products.filter { product in
+        let baseProducts = showNewProductsOnly ? productService.getNewProducts() : productService.products
+        return baseProducts.filter { product in
             matchesCategory(product: product, category: selectedCategory)
         }
     }
@@ -253,79 +261,134 @@ struct ShopView: View {
     }
     
     @Environment(\.presentationMode) var presentationMode
+    @Environment(\.dismiss) var dismiss
     
     var body: some View {
-        NavigationView {
-            ScrollView {
-                VStack(alignment: .leading, spacing: 20) {
-                    // Если есть поисковый запрос, показываем результаты поиска
-                    if !searchText.isEmpty {
-                        searchResultsView
-                    } else {
-                        // Обычный контент магазина
-                        shopContentView
+        Group {
+            if showBackButton {
+                // Когда открыт через NavigationLink, не создаем новый NavigationView
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 20) {
+                        // Если есть поисковый запрос, показываем результаты поиска
+                        if !searchText.isEmpty {
+                            searchResultsView
+                        } else {
+                            // Обычный контент магазина
+                            shopContentView
+                        }
                     }
+                    .padding(.vertical)
                 }
-                .padding(.vertical)
-            }
-            .navigationTitle("Shop")
-            .navigationBarTitleDisplayMode(.large)
-            .navigationBarBackButtonHidden(true)
-            .toolbar {
-                ToolbarItem(placement: .navigationBarLeading) {
-                    Button(action: {
-                        presentationMode.wrappedValue.dismiss()
-                    }) {
-                        HStack(spacing: 4) {
+                .navigationTitle("Shop")
+                .navigationBarTitleDisplayMode(.large)
+                .navigationBarBackButtonHidden(true)
+                .toolbar {
+                    ToolbarItem(placement: .navigationBarLeading) {
+                        Button(action: {
+                            dismiss()
+                        }) {
                             Image(systemName: "chevron.left")
                                 .font(.system(size: 16, weight: .semibold))
-                                .foregroundColor(.blue)
-                            Text("Home")
-                                .font(.system(size: 17))
-                                .foregroundColor(.blue)
+                                .foregroundColor(.black)
                         }
                     }
-                }
-                
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    HStack(spacing: 12) {
-                        // Поле поиска, показывается при активации
-                        if isSearchActive {
-                            TextField("Поиск товаров", text: $searchText)
-                                .textFieldStyle(.roundedBorder)
-                                .frame(width: 200)
-                                .focused($isSearchFieldFocused)
-                                .transition(.opacity)
-                                .onAppear {
-                                    // Автоматически фокусируем поле при появлении
-                                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                                        isSearchFieldFocused = true
+                    
+                    ToolbarItem(placement: .navigationBarTrailing) {
+                        HStack(spacing: 12) {
+                            // Поле поиска, показывается при активации
+                            if isSearchActive {
+                                TextField("Поиск товаров", text: $searchText)
+                                    .textFieldStyle(.roundedBorder)
+                                    .frame(width: 200)
+                                    .focused($isSearchFieldFocused)
+                                    .transition(.opacity)
+                                    .onAppear {
+                                        // Автоматически фокусируем поле при появлении
+                                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                                            isSearchFieldFocused = true
+                                        }
+                                    }
+                            }
+                            
+                            // Кнопка поиска
+                            Button(action: {
+                                withAnimation(.easeInOut(duration: 0.2)) {
+                                    if isSearchActive {
+                                        // Закрываем поиск
+                                        isSearchActive = false
+                                        searchText = ""
+                                        isSearchFieldFocused = false
+                                    } else {
+                                        // Открываем поиск
+                                        isSearchActive = true
                                     }
                                 }
-                        }
-                        
-                        // Кнопка поиска
-                        Button(action: {
-                            withAnimation(.easeInOut(duration: 0.2)) {
-                                if isSearchActive {
-                                    // Закрываем поиск
-                                    isSearchActive = false
-                                    searchText = ""
-                                    isSearchFieldFocused = false
-                                } else {
-                                    // Открываем поиск
-                                    isSearchActive = true
-                                }
+                            }) {
+                                Image(systemName: "magnifyingglass")
+                                    .foregroundColor(.primary)
                             }
-                        }) {
-                            Image(systemName: "magnifyingglass")
-                                .foregroundColor(.primary)
                         }
                     }
                 }
+            } else {
+                // Когда открыт как вкладка, создаем NavigationView
+                NavigationView {
+                    ScrollView {
+                        VStack(alignment: .leading, spacing: 20) {
+                            // Если есть поисковый запрос, показываем результаты поиска
+                            if !searchText.isEmpty {
+                                searchResultsView
+                            } else {
+                                // Обычный контент магазина
+                                shopContentView
+                            }
+                        }
+                        .padding(.vertical)
+                    }
+                    .navigationTitle("Shop")
+                    .navigationBarTitleDisplayMode(.large)
+                    .toolbar {
+                        ToolbarItem(placement: .navigationBarTrailing) {
+                            HStack(spacing: 12) {
+                                // Поле поиска, показывается при активации
+                                if isSearchActive {
+                                    TextField("Поиск товаров", text: $searchText)
+                                        .textFieldStyle(.roundedBorder)
+                                        .frame(width: 200)
+                                        .focused($isSearchFieldFocused)
+                                        .transition(.opacity)
+                                        .onAppear {
+                                            // Автоматически фокусируем поле при появлении
+                                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                                                isSearchFieldFocused = true
+                                            }
+                                        }
+                                }
+                                
+                                // Кнопка поиска
+                                Button(action: {
+                                    withAnimation(.easeInOut(duration: 0.2)) {
+                                        if isSearchActive {
+                                            // Закрываем поиск
+                                            isSearchActive = false
+                                            searchText = ""
+                                            isSearchFieldFocused = false
+                                        } else {
+                                            // Открываем поиск
+                                            isSearchActive = true
+                                        }
+                                    }
+                                }) {
+                                    Image(systemName: "magnifyingglass")
+                                        .foregroundColor(.primary)
+                                }
+                            }
+                        }
+                    }
+                }
+                .navigationViewStyle(.stack)
             }
         }
-        .navigationViewStyle(.stack)
     }
     
     // MARK: - Search Results View
@@ -371,52 +434,54 @@ struct ShopView: View {
     // MARK: - Shop Content View
     private var shopContentView: some View {
         VStack(alignment: .leading, spacing: 20) {
-                    // Категории как переключаемые табы
-                    VStack(spacing: 0) {
-                        HStack(spacing: 0) {
-                            ForEach(categories, id: \.self) { category in
-                                Button(action: {
-                                    withAnimation(.easeInOut(duration: 0.2)) {
-                                        selectedCategory = category
+                    // Категории как переключаемые табы (скрываем, если показываем только новые товары)
+                    if !showNewProductsOnly {
+                        VStack(spacing: 0) {
+                            HStack(spacing: 0) {
+                                ForEach(categories, id: \.self) { category in
+                                    Button(action: {
+                                        withAnimation(.easeInOut(duration: 0.2)) {
+                                            selectedCategory = category
+                                        }
+                                    }) {
+                                        VStack(spacing: 8) {
+                                            Text(category)
+                                                .font(.system(size: 16, weight: selectedCategory == category ? .semibold : .regular))
+                                                .foregroundColor(selectedCategory == category ? .primary : .secondary)
+                                            
+                                            Rectangle()
+                                                .fill(selectedCategory == category ? Color.primary : Color.clear)
+                                                .frame(height: 2)
+                                        }
+                                        .frame(maxWidth: .infinity)
                                     }
-                                }) {
-                                    VStack(spacing: 8) {
-                                        Text(category)
-                                            .font(.system(size: 16, weight: selectedCategory == category ? .semibold : .regular))
-                                            .foregroundColor(selectedCategory == category ? .primary : .secondary)
-                                        
-                                        Rectangle()
-                                            .fill(selectedCategory == category ? Color.primary : Color.clear)
-                                            .frame(height: 2)
-                                    }
-                                    .frame(maxWidth: .infinity)
+                                    .buttonStyle(PlainButtonStyle())
                                 }
-                                .buttonStyle(PlainButtonStyle())
                             }
-                        }
-                        .padding(.horizontal)
-                        .padding(.top, 8)
-                        
-                        // Разделительная линия под табами
-                        Rectangle()
-                            .fill(Color.gray.opacity(0.2))
-                            .frame(height: 1)
+                            .padding(.horizontal)
                             .padding(.top, 8)
+                            
+                            // Разделительная линия под табами
+                            Rectangle()
+                                .fill(Color.gray.opacity(0.2))
+                                .frame(height: 1)
+                                .padding(.top, 8)
+                        }
                     }
                     
                     // Секция с продуктами выбранной категории
                     VStack(alignment: .leading, spacing: 16) {
-                        Text("\(selectedCategory) Collection")
+                        Text(showNewProductsOnly ? "New Collection" : "\(selectedCategory) Collection")
                             .font(.system(size: 24, weight: .bold))
                             .padding(.horizontal)
                         
-                        let categoryProducts = filteredProductsByCategory
+                        let categoryProducts = showNewProductsOnly ? productService.getNewProducts() : filteredProductsByCategory
                         if !categoryProducts.isEmpty {
                             LazyVGrid(columns: [
                                 GridItem(.flexible(), spacing: 12),
                                 GridItem(.flexible(), spacing: 12)
                             ], spacing: 16) {
-                                ForEach(categoryProducts.prefix(6)) { product in
+                                ForEach(categoryProducts) { product in
                                     NavigationLink(destination: ProductDetailView(productId: product.id, productService: productService)) {
                                         ProductGridCard(
                                             product: product,
@@ -434,7 +499,7 @@ struct ShopView: View {
                                 Image(systemName: "tray")
                                     .font(.system(size: 50))
                                     .foregroundColor(.secondary)
-                                Text("Товары категории \"\(selectedCategory)\" не найдены")
+                                Text(showNewProductsOnly ? "Новые товары не найдены" : "Товары категории \"\(selectedCategory)\" не найдены")
                                     .font(.system(size: 16))
                                     .foregroundColor(.secondary)
                             }
@@ -444,8 +509,9 @@ struct ShopView: View {
                     }
                     .padding(.top, 16)
                     
-                    // Секция "Must-Haves, Best Sellers & More"
-                    VStack(alignment: .leading, spacing: 16) {
+                    // Секция "Must-Haves, Best Sellers & More" (скрываем для новых товаров)
+                    if !showNewProductsOnly {
+                        VStack(alignment: .leading, spacing: 16) {
                         Text("Must-Haves, Best Sellers & More")
                             .font(.system(size: 18, weight: .semibold))
                             .padding(.horizontal)
@@ -498,9 +564,11 @@ struct ShopView: View {
                         .padding(.top, 8)
                     }
                     .padding(.top, 8)
+                    }
                     
-                    // Баннер "New & Featured"
-                    VStack(alignment: .leading, spacing: 12) {
+                    // Баннер "New & Featured" (скрываем для новых товаров)
+                    if !showNewProductsOnly {
+                        VStack(alignment: .leading, spacing: 12) {
                         BannerCard(
                             title: "New & Featured",
                             imageName: "crossovki2",
@@ -509,9 +577,11 @@ struct ShopView: View {
                         .padding(.horizontal)
                     }
                     .padding(.top, 8)
+                    }
                     
-                    // Секция "Best Sellers"
-                    VStack(alignment: .leading, spacing: 16) {
+                    // Секция "Best Sellers" (скрываем для новых товаров)
+                    if !showNewProductsOnly {
+                        VStack(alignment: .leading, spacing: 16) {
                         Text("Best Sellers")
                             .font(.system(size: 24, weight: .bold))
                             .padding(.horizontal)
@@ -563,9 +633,11 @@ struct ShopView: View {
                         }
                     }
                     .padding(.top, 8)
+                    }
                     
-            // Дополнительный контент - секция Shoes
-            VStack(alignment: .leading, spacing: 12) {
+            // Дополнительный контент - секция Shoes (скрываем для новых товаров)
+            if !showNewProductsOnly {
+                VStack(alignment: .leading, spacing: 12) {
                 Text("Shoes")
                     .font(.system(size: 18, weight: .semibold))
                     .padding(.horizontal)
@@ -594,6 +666,7 @@ struct ShopView: View {
                         .padding(.horizontal)
                     }
                 }
+            }
             }
         }
     }
