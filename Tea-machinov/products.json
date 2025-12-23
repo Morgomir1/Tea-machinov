@@ -1,0 +1,93 @@
+[
+  {
+    "brand": "Jordan Essentials",
+    "product_name": "Men Fleece Pullover Hoodie 5 Colours",
+    "price": 60,
+    "items_left": 5,
+    "image_url": "https://github.com/pbukhon/VSU_lectures/blob/16186c290d9a7489a4e1e6ada3bb80151537a549/resources/36960_210553_53776-removebg-preview%201.png?raw=true",
+    "is_liked": false,
+    "is_bestseller": false,
+    "description": "Уютная толстовка с капюшоном из мягкого флиса. Идеально подходит для повседневной носки и тренировок. Доступна в 5 цветах."
+  },
+  {
+    "brand": "Nike Sportswear Club",
+    "product_name": "Basketball Backpack (32L) 3 Colours",
+    "price": 85,
+    "items_left": 5,
+    "image_url": "https://github.com/pbukhon/VSU_lectures/blob/16186c290d9a7489a4e1e6ada3bb80151537a549/resources/Screen%20Shot%202022-06-30%20at%205.54%201.png?raw=true",
+    "is_liked": false,
+    "is_bestseller": true,
+    "description": "Вместительный рюкзак для баскетбола объемом 32 литра. Идеально подходит для переноски спортивного инвентаря и личных вещей. Прочный материал и удобные лямки."
+  },
+  {
+    "brand": "Nike",
+    "product_name": "Dri-FIT Miler 3 Colours",
+    "price": 85,
+    "items_left": 5,
+    "image_url": "https://github.com/pbukhon/VSU_lectures/blob/16186c290d9a7489a4e1e6ada3bb80151537a549/resources/Screen%20Shot%202022-06-30%20at%205.55%201.png?raw=true",
+    "is_liked": false,
+    "is_bestseller": true,
+    "category": "Shoes",
+    "description": "Легкие беговые кроссовки с технологией Dri-FIT для отвода влаги. Обеспечивают комфорт и поддержку во время бега. Доступны в 3 цветах."
+  },
+  {
+    "brand": "Nike Elite Pro",
+    "product_name": "Basketball Backpack (32L) 3 Colours",
+    "price": 85,
+    "items_left": 5,
+    "image_url": "https://github.com/pbukhon/VSU_lectures/blob/16186c290d9a7489a4e1e6ada3bb80151537a549/resources/image%2022.png?raw=true",
+    "is_liked": false,
+    "is_bestseller": false,
+    "description": "Профессиональный рюкзак для баскетбола с множеством карманов и отделений. Вместительный и удобный для спортсменов."
+  },
+  {
+    "brand": "Jordan Essentials Statement",
+    "product_name": "Basketball Backpack (32L) 3 Colours",
+    "price": 85,
+    "items_left": 5,
+    "image_url": "https://github.com/pbukhon/VSU_lectures/blob/16186c290d9a7489a4e1e6ada3bb80151537a549/resources/jordan-essentials-mens-fleece-pullover-hoodie-jG54lf-removebg-preview%201.png?raw=true",
+    "is_liked": false,
+    "is_bestseller": false,
+    "description": "Стильная толстовка с капюшоном от Jordan Essentials. Мягкий флис и современный дизайн делают её идеальным выбором для повседневной носки."
+  },
+  {
+    "brand": "Jordan Essentials",
+    "product_name": "Men's Woven Jacket (32L) 3 Colours",
+    "price": 85,
+    "items_left": 5,
+    "image_url": "https://github.com/pbukhon/VSU_lectures/blob/16186c290d9a7489a4e1e6ada3bb80151537a549/resources/sportswear-club-fleece-joggers-KflRdQ-removebg-preview%201.png?raw=true",
+    "is_liked": false,
+    "is_bestseller": false,
+    "description": "Куртка из тканного материала с современным дизайном. Легкая и стильная, подходит для различных погодных условий."
+  },
+  {
+    "brand": "Jordan Essentials",
+    "product_name": "Men Fleece Pullover 6 Colours",
+    "price": 60,
+    "items_left": 5,
+    "image_url": "https://github.com/pbukhon/VSU_lectures/blob/16186c290d9a7489a4e1e6ada3bb80151537a549/resources/sportswear-tech-fleece-mens-crew-sweatshirt-pfjm2W-removebg-preview%201.png?raw=true",
+    "is_liked": false,
+    "is_bestseller": false,
+    "description": "Удобная толстовка из флиса с круглым вырезом. Мягкая ткань и свободный крой обеспечивают максимальный комфорт. Доступна в 6 цветах."
+  },
+  {
+    "brand": "Nike Therma",
+    "product_name": "Men's Pullover Training Hoodie",
+    "price": 33.97,
+    "items_left": 5,
+    "image_url": "https://github.com/pbukhon/VSU_lectures/blob/16186c290d9a7489a4e1e6ada3bb80151537a549/resources/therma-mens-pullover-training-hoodie-zTst4l_prev_ui%201.png?raw=true",
+    "is_liked": false,
+    "is_bestseller": true,
+    "description": "Тренировочная толстовка с капюшоном из терморегулирующего материала. Идеально подходит для тренировок в прохладную погоду."
+  },
+  {
+    "brand": "Nike Heritage",
+    "product_name": "Basketball Backpack (32L) 4 Colours",
+    "price": 40.97,
+    "items_left": 0,
+    "image_url": "https://github.com/pbukhon/VSU_lectures/blob/f457ddf9be1ffa0408c0592692d6f208e803295e/resources/Screen%20Shot%202022-06-30%20at%203.05%201.png?raw=true",
+    "is_liked": false,
+    "is_bestseller": false,
+    "description": "Классический рюкзак для баскетбола в стиле Heritage. Вместительный и надежный, подходит для ежедневного использования."
+  }
+]

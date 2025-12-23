@@ -10,14 +10,18 @@
 import SwiftUI
 
 struct ContentView: View {
-    @State private var currentScreen: AppScreen = .main
+    @State private var currentScreen: AppScreen = .splash
     
     enum AppScreen {
-        case main, onboarding, tabs
+        case splash, main, onboarding, tabs
     }
     
     var body: some View {
         switch currentScreen {
+        case .splash:
+            SplashScreen(onFinish: {
+                currentScreen = .main
+            })
         case .main:
             MainScreen(goToOnboarding: {
                 currentScreen = .onboarding
