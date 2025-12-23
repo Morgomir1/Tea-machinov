@@ -187,6 +187,7 @@ struct ProductDetailView: View {
             .padding(.bottom, 20)
         }
         .navigationBarTitleDisplayMode(.inline)
+        .navigationBarBackButtonHidden(true)
         .toolbar {
             ToolbarItem(placement: .navigationBarLeading) {
                 Button(action: {

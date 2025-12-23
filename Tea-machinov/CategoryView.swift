@@ -86,6 +86,7 @@ struct CategoryView: View {
         }
         .navigationTitle(categoryName)
         .navigationBarTitleDisplayMode(.large)
+        .navigationBarBackButtonHidden(true)
         .toolbar {
             ToolbarItem(placement: .navigationBarLeading) {
                 Button(action: {
