@@ -112,12 +112,15 @@ struct HomeView: View {
                         ScrollView(.horizontal, showsIndicators: false) {
                             HStack(spacing: 12) {
                                 ForEach(productService.getRecommendedProducts()) { product in
-                                    RecommendedProductCard(
-                                        product: product,
-                                        onLikeToggle: {
-                                            productService.toggleLike(for: product)
-                                        }
-                                    )
+                                    NavigationLink(destination: ProductDetailView(productId: product.id, productService: productService)) {
+                                        RecommendedProductCard(
+                                            product: product,
+                                            onLikeToggle: {
+                                                productService.toggleLike(for: product)
+                                            }
+                                        )
+                                    }
+                                    .buttonStyle(PlainButtonStyle())
                                 }
                             }
                             .padding(.horizontal)
@@ -160,9 +163,7 @@ struct ShopView: View {
                     // Категории
                     HStack(spacing: 30) {
                         ForEach(categories, id: \.self) { category in
-                            Button(action: {
-                                selectedCategory = category
-                            }) {
+                            NavigationLink(destination: CategoryView(categoryName: category, productService: productService)) {
                                 VStack(spacing: 4) {
                                     Text(category)
                                         .font(.system(size: 16, weight: selectedCategory == category ? .semibold : .regular))
@@ -175,6 +176,9 @@ struct ShopView: View {
                                     }
                                 }
                             }
+                            .simultaneousGesture(TapGesture().onEnded {
+                                selectedCategory = category
+                            })
                         }
                         Spacer()
                     }
@@ -190,18 +194,24 @@ struct ShopView: View {
                         // Две карточки рядом
                         HStack(spacing: 12) {
                             // Карточка "Best Sellers"
-                            CategoryCard(
-                                title: "Best Sellers",
-                                imageName: "crossovki",
-                                height: 180
-                            )
+                            NavigationLink(destination: CategoryView(categoryName: "Best Sellers", productService: productService)) {
+                                CategoryCard(
+                                    title: "Best Sellers",
+                                    imageName: "crossovki",
+                                    height: 180
+                                )
+                            }
+                            .buttonStyle(PlainButtonStyle())
                             
                             // Карточка "Featured in Nike Air"
-                            CategoryCard(
-                                title: "Featured in Nike Air",
-                                imageName: "muzhik1",
-                                height: 180
-                            )
+                            NavigationLink(destination: CategoryView(categoryName: "Featured in Nike Air", productService: productService)) {
+                                CategoryCard(
+                                    title: "Featured in Nike Air",
+                                    imageName: "muzhik1",
+                                    height: 180
+                                )
+                            }
+                            .buttonStyle(PlainButtonStyle())
                         }
                         .padding(.horizontal)
                     }
@@ -228,9 +238,7 @@ struct ShopView: View {
                         ScrollView(.horizontal, showsIndicators: false) {
                             HStack(spacing: 20) {
                                 ForEach(bestSellerCategories, id: \.self) { category in
-                                    Button(action: {
-                                        selectedBestSellerCategory = category
-                                    }) {
+                                    NavigationLink(destination: CategoryView(categoryName: category, productService: productService)) {
                                         VStack(spacing: 4) {
                                             Text(category)
                                                 .font(.system(size: 14, weight: selectedBestSellerCategory == category ? .semibold : .regular))
@@ -243,6 +251,9 @@ struct ShopView: View {
                                             }
                                         }
                                     }
+                                    .simultaneousGesture(TapGesture().onEnded {
+                                        selectedBestSellerCategory = category
+                                    })
                                 }
                             }
                             .padding(.horizontal)
@@ -256,12 +267,15 @@ struct ShopView: View {
                                 GridItem(.flexible(), spacing: 12)
                             ], spacing: 16) {
                                 ForEach(bestsellers.prefix(4)) { product in
-                                    ProductGridCard(
-                                        product: product,
-                                        onLikeToggle: {
-                                            productService.toggleLike(for: product)
-                                        }
-                                    )
+                                    NavigationLink(destination: ProductDetailView(productId: product.id, productService: productService)) {
+                                        ProductGridCard(
+                                            product: product,
+                                            onLikeToggle: {
+                                                productService.toggleLike(for: product)
+                                            }
+                                        )
+                                    }
+                                    .buttonStyle(PlainButtonStyle())
                                 }
                             }
                             .padding(.horizontal)
