@@ -9,7 +9,7 @@ import SwiftUI
 
 struct ProductDetailView: View {
     let productId: UUID
-    @ObservedObject var productService: ProductService
+    @EnvironmentObject var productService: ProductService
     @Environment(\.dismiss) var dismiss
     @State private var selectedImageIndex = 0
     
