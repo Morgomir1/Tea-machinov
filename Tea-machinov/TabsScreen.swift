@@ -129,18 +129,8 @@ struct HomeView: View {
                 }
                 .padding(.vertical)
             }
-            .navigationTitle("Shop")
+            .navigationTitle("Home")
             .navigationBarTitleDisplayMode(.large)
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button(action: {
-                        print("Search for: \(searchText)")
-                    }) {
-                        Image(systemName: "magnifyingglass")
-                            .foregroundColor(.primary)
-                    }
-                }
-            }
         }
         .navigationViewStyle(.stack)
     }
@@ -272,14 +262,6 @@ struct ShopView: View {
                                         isSearchFieldFocused = true
                                     }
                                 }
-                        }
-                        
-                        // Кнопка фильтра
-                        Button(action: {
-                            // Действие фильтра
-                        }) {
-                            Image(systemName: "line.3.horizontal.decrease.circle")
-                                .foregroundColor(.primary)
                         }
                         
                         // Кнопка поиска
