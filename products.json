@@ -79,23 +79,5 @@
     "image_url": "https://github.com/pbukhon/VSU_lectures/blob/f457ddf9be1ffa0408c0592692d6f208e803295e/resources/Screen%20Shot%202022-06-30%20at%203.05%201.png?raw=true",
     "is_liked": false,
     "is_bestseller": false
-  },
-  {
-    "brand": "",
-    "product_name": "",
-    "price": 60,
-    "items_left": 5,
-    "image_url": "https://github.com/pbukhon/VSU_lectures/blob/f457ddf9be1ffa0408c0592692d6f208e803295e/resources/image%2026.png?raw=true",
-    "is_liked": false,
-    "is_bestseller": false
-  },
-  {
-    "brand": "",
-    "product_name": "",
-    "price": 60,
-    "items_left": 5,
-    "image_url": "https://github.com/pbukhon/VSU_lectures/blob/f457ddf9be1ffa0408c0592692d6f208e803295e/resources/image%2027.png?raw=true",
-    "is_liked": false,
-    "is_bestseller": false
   }
 ]

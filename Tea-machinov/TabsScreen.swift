@@ -9,6 +9,7 @@ import SwiftUI
 
 struct TabsScreen: View {
     @State private var selectedTab = 0
+    @StateObject private var cartService = CartService()
     
     var body: some View {
         TabView(selection: $selectedTab) {
@@ -58,19 +59,16 @@ struct TabsScreen: View {
             UITabBar.appearance().standardAppearance = appearance
             UITabBar.appearance().scrollEdgeAppearance = appearance
         }
+        .environmentObject(cartService)
     }
 }
 
 // MARK: - Home View
 struct HomeView: View {
     @StateObject private var productService = ProductService()
+    @StateObject private var interestService = InterestService()
     @State private var searchText = ""
-    
-    let interests = [
-        ("Running", "muzhik1"),
-        ("Training", "crossovki"),
-        ("Basketball", "crossovki2")
-    ]
+    @State private var showAddInterestSheet = false
     
     var body: some View {
         NavigationView {
@@ -85,7 +83,7 @@ struct HomeView: View {
                             Spacer()
                             
                             Button("Add Interest") {
-                                // Действие добавления интереса
+                                showAddInterestSheet = true
                             }
                             .font(.system(size: 14))
                             .foregroundColor(.secondary)
@@ -94,12 +92,30 @@ struct HomeView: View {
                         
                         ScrollView(.horizontal, showsIndicators: false) {
                             HStack(spacing: 12) {
-                                ForEach(interests, id: \.0) { interest in
-                                    InterestCard(title: interest.0, imageName: interest.1)
+                                ForEach(interestService.selectedInterests) { interest in
+                                    NavigationLink(destination: ShopView(initialCategory: interest.category)) {
+                                        InterestCard(title: interest.title, imageName: interest.imageName)
+                                    }
+                                    .buttonStyle(PlainButtonStyle())
                                 }
                             }
                             .padding(.horizontal)
                         }
+                    }
+                    .padding(.top, 8)
+                    .sheet(isPresented: $showAddInterestSheet) {
+                        AddInterestView(interestService: interestService)
+                    }
+                    
+                    // Промо-баннер с изображением из онбординга
+                    VStack(alignment: .leading, spacing: 12) {
+                        PromoBannerCard(
+                            title: "New Collection",
+                            subtitle: "Discover the latest styles",
+                            imageName: "crossovki4",
+                            height: 200
+                        )
+                        .padding(.horizontal)
                     }
                     .padding(.top, 8)
                     
@@ -139,7 +155,13 @@ struct HomeView: View {
 // MARK: - Shop View
 struct ShopView: View {
     @StateObject private var productService = ProductService()
-    @State private var selectedCategory: String = "Men"
+    @State private var selectedCategory: String
+    let initialCategory: String?
+    
+    init(initialCategory: String? = nil) {
+        _selectedCategory = State(initialValue: initialCategory ?? "Men")
+        self.initialCategory = initialCategory
+    }
     @State private var selectedBestSellerCategory: String = "Socks"
     @State private var searchText = ""
     @State private var isSearchActive = false
@@ -230,6 +252,8 @@ struct ShopView: View {
         }
     }
     
+    @Environment(\.presentationMode) var presentationMode
+    
     var body: some View {
         NavigationView {
             ScrollView {
@@ -246,7 +270,23 @@ struct ShopView: View {
             }
             .navigationTitle("Shop")
             .navigationBarTitleDisplayMode(.large)
+            .navigationBarBackButtonHidden(true)
             .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button(action: {
+                        presentationMode.wrappedValue.dismiss()
+                    }) {
+                        HStack(spacing: 4) {
+                            Image(systemName: "chevron.left")
+                                .font(.system(size: 16, weight: .semibold))
+                                .foregroundColor(.blue)
+                            Text("Home")
+                                .font(.system(size: 17))
+                                .foregroundColor(.blue)
+                        }
+                    }
+                }
+                
                 ToolbarItem(placement: .navigationBarTrailing) {
                     HStack(spacing: 12) {
                         // Поле поиска, показывается при активации
@@ -433,6 +473,29 @@ struct ShopView: View {
                             .buttonStyle(PlainButtonStyle())
                         }
                         .padding(.horizontal)
+                        
+                        // Дополнительные карточки с изображениями из онбординга
+                        HStack(spacing: 12) {
+                            NavigationLink(destination: CategoryView(categoryName: "New Arrivals", productService: productService)) {
+                                CategoryCard(
+                                    title: "New Arrivals",
+                                    imageName: "tetka1",
+                                    height: 180
+                                )
+                            }
+                            .buttonStyle(PlainButtonStyle())
+                            
+                            NavigationLink(destination: CategoryView(categoryName: "Special Offers", productService: productService)) {
+                                CategoryCard(
+                                    title: "Special Offers",
+                                    imageName: "tetka2",
+                                    height: 180
+                                )
+                            }
+                            .buttonStyle(PlainButtonStyle())
+                        }
+                        .padding(.horizontal)
+                        .padding(.top, 8)
                     }
                     .padding(.top, 8)
                     
@@ -501,19 +564,35 @@ struct ShopView: View {
                     }
                     .padding(.top, 8)
                     
-            // Дополнительный контент (можно добавить больше секций)
+            // Дополнительный контент - секция Shoes
             VStack(alignment: .leading, spacing: 12) {
                 Text("Shoes")
                     .font(.system(size: 18, weight: .semibold))
                     .padding(.horizontal)
                 
-                ScrollView(.horizontal, showsIndicators: false) {
-                    HStack(spacing: 12) {
-                        ForEach(["crossovki3", "crossovki4"], id: \.self) { imageName in
-                            ProductCard(imageName: imageName)
+                let shoesProducts = productService.products.filter { product in
+                    product.category?.lowercased() == "shoes" ||
+                    product.product_name.lowercased().contains("shoe") ||
+                    product.product_name.lowercased().contains("sneaker")
+                }
+                
+                if !shoesProducts.isEmpty {
+                    ScrollView(.horizontal, showsIndicators: false) {
+                        HStack(spacing: 12) {
+                            ForEach(shoesProducts.prefix(4)) { product in
+                                NavigationLink(destination: ProductDetailView(productId: product.id, productService: productService)) {
+                                    RecommendedProductCard(
+                                        product: product,
+                                        onLikeToggle: {
+                                            productService.toggleLike(for: product)
+                                        }
+                                    )
+                                }
+                                .buttonStyle(PlainButtonStyle())
+                            }
                         }
+                        .padding(.horizontal)
                     }
-                    .padding(.horizontal)
                 }
             }
         }
@@ -579,6 +658,44 @@ struct BannerCard: View {
     }
 }
 
+// MARK: - Promo Banner Card Component
+struct PromoBannerCard: View {
+    let title: String
+    let subtitle: String
+    let imageName: String
+    let height: CGFloat
+    
+    var body: some View {
+        ZStack(alignment: .leading) {
+            Image(imageName)
+                .resizable()
+                .aspectRatio(contentMode: .fill)
+                .frame(height: height)
+                .clipped()
+                .cornerRadius(12)
+            
+            // Градиент для лучшей читаемости текста
+            LinearGradient(
+                gradient: Gradient(colors: [Color.black.opacity(0.4), Color.clear]),
+                startPoint: .leading,
+                endPoint: .trailing
+            )
+            .cornerRadius(12)
+            
+            VStack(alignment: .leading, spacing: 8) {
+                Text(title)
+                    .font(.system(size: 24, weight: .bold))
+                    .foregroundColor(.white)
+                Text(subtitle)
+                    .font(.system(size: 16))
+                    .foregroundColor(.white.opacity(0.9))
+            }
+            .padding(.leading, 20)
+            .padding(.top, 20)
+        }
+    }
+}
+
 // MARK: - Product Card Component
 struct ProductCard: View {
     let imageName: String
@@ -597,21 +714,50 @@ struct ProductCard: View {
 
 // MARK: - Favourites View
 struct FavouritesView: View {
+    @StateObject private var productService = ProductService()
+    
+    var likedProducts: [Product] {
+        productService.products.filter { $0.is_liked }
+    }
+    
     var body: some View {
         NavigationView {
-            ZStack {
-                Color(.systemBackground)
-                    .ignoresSafeArea()
-                
-                VStack {
-                    Text("Favourites Screen")
-                        .font(.largeTitle)
-                        .fontWeight(.bold)
-                    
-                    Image(systemName: "heart.fill")
-                        .font(.system(size: 60))
-                        .foregroundColor(.red)
-                        .padding()
+            ScrollView {
+                if likedProducts.isEmpty {
+                    VStack(spacing: 16) {
+                        Image(systemName: "heart")
+                            .font(.system(size: 60))
+                            .foregroundColor(.secondary)
+                        Text("Нет избранных товаров")
+                            .font(.system(size: 18, weight: .medium))
+                            .foregroundColor(.secondary)
+                        Text("Добавьте товары в избранное, нажав на иконку сердца")
+                            .font(.system(size: 14))
+                            .foregroundColor(.secondary)
+                            .multilineTextAlignment(.center)
+                            .padding(.horizontal)
+                    }
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 100)
+                } else {
+                    LazyVGrid(columns: [
+                        GridItem(.flexible(), spacing: 12),
+                        GridItem(.flexible(), spacing: 12)
+                    ], spacing: 16) {
+                        ForEach(likedProducts) { product in
+                            NavigationLink(destination: ProductDetailView(productId: product.id, productService: productService)) {
+                                ProductGridCard(
+                                    product: product,
+                                    onLikeToggle: {
+                                        productService.toggleLike(for: product)
+                                    }
+                                )
+                            }
+                            .buttonStyle(PlainButtonStyle())
+                        }
+                    }
+                    .padding(.horizontal)
+                    .padding(.vertical)
                 }
             }
             .navigationTitle("Favourites")
@@ -623,27 +769,168 @@ struct FavouritesView: View {
 
 // MARK: - Bag View
 struct BagView: View {
+    @EnvironmentObject var cartService: CartService
+    
     var body: some View {
         NavigationView {
-            ZStack {
-                Color(.systemBackground)
-                    .ignoresSafeArea()
-                
-                VStack {
-                    Text("Bag Screen")
-                        .font(.largeTitle)
-                        .fontWeight(.bold)
-                    
-                    Image(systemName: "bag.fill")
-                        .font(.system(size: 60))
-                        .foregroundColor(.orange)
+            VStack(spacing: 0) {
+                if cartService.items.isEmpty {
+                    VStack(spacing: 16) {
+                        Image(systemName: "bag")
+                            .font(.system(size: 60))
+                            .foregroundColor(.secondary)
+                        Text("Корзина пуста")
+                            .font(.system(size: 18, weight: .medium))
+                            .foregroundColor(.secondary)
+                        Text("Добавьте товары в корзину, чтобы они появились здесь")
+                            .font(.system(size: 14))
+                            .foregroundColor(.secondary)
+                            .multilineTextAlignment(.center)
+                            .padding(.horizontal)
+                    }
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                } else {
+                    ScrollView {
+                        VStack(spacing: 16) {
+                            ForEach(cartService.items) { item in
+                                CartItemRow(
+                                    item: item,
+                                    onQuantityChange: { newQuantity in
+                                        cartService.updateQuantity(for: item.product, quantity: newQuantity)
+                                    },
+                                    onRemove: {
+                                        cartService.removeProduct(item.product)
+                                    }
+                                )
+                            }
+                        }
                         .padding()
+                    }
+                    
+                    // Итого и кнопка оформления
+                    VStack(spacing: 12) {
+                        HStack {
+                            Text("Итого:")
+                                .font(.system(size: 18, weight: .semibold))
+                            Spacer()
+                            Text(cartService.formattedTotalPrice)
+                                .font(.system(size: 20, weight: .bold))
+                        }
+                        .padding(.horizontal)
+                        
+                        Button(action: {
+                            // Действие оформления заказа
+                            print("Оформление заказа на сумму \(cartService.formattedTotalPrice)")
+                        }) {
+                            HStack {
+                                Spacer()
+                                Text("Оформить заказ")
+                                    .font(.system(size: 18, weight: .semibold))
+                                    .foregroundColor(.white)
+                                Spacer()
+                            }
+                            .padding()
+                            .background(Color.black)
+                            .cornerRadius(12)
+                        }
+                        .padding(.horizontal)
+                    }
+                    .padding(.vertical)
+                    .background(Color(.systemBackground))
                 }
             }
             .navigationTitle("Bag")
             .navigationBarTitleDisplayMode(.large)
         }
         .navigationViewStyle(.stack)
+        .environmentObject(cartService)
+    }
+}
+
+// MARK: - Cart Item Row
+struct CartItemRow: View {
+    let item: CartItem
+    let onQuantityChange: (Int) -> Void
+    let onRemove: () -> Void
+    @State private var quantity: Int
+    
+    init(item: CartItem, onQuantityChange: @escaping (Int) -> Void, onRemove: @escaping () -> Void) {
+        self.item = item
+        self.onQuantityChange = onQuantityChange
+        self.onRemove = onRemove
+        _quantity = State(initialValue: item.quantity)
+    }
+    
+    var body: some View {
+        HStack(spacing: 12) {
+            // Изображение товара
+            AsyncImage(url: URL(string: item.product.image_url)) { image in
+                image
+                    .resizable()
+                    .aspectRatio(contentMode: .fill)
+            } placeholder: {
+                Rectangle()
+                    .fill(Color.gray.opacity(0.2))
+                    .overlay(ProgressView())
+            }
+            .frame(width: 100, height: 100)
+            .clipped()
+            .cornerRadius(12)
+            
+            // Информация о товаре
+            VStack(alignment: .leading, spacing: 4) {
+                Text(item.product.brand)
+                    .font(.system(size: 14, weight: .medium))
+                Text(item.product.product_name)
+                    .font(.system(size: 12))
+                    .foregroundColor(.secondary)
+                    .lineLimit(2)
+                Text(item.product.formattedPrice)
+                    .font(.system(size: 14, weight: .semibold))
+                    .padding(.top, 4)
+            }
+            
+            Spacer()
+            
+            // Управление количеством
+            VStack(spacing: 8) {
+                Button(action: {
+                    if quantity > 1 {
+                        quantity -= 1
+                        onQuantityChange(quantity)
+                    }
+                }) {
+                    Image(systemName: "minus.circle")
+                        .font(.system(size: 20))
+                        .foregroundColor(quantity > 1 ? .primary : .secondary)
+                }
+                .disabled(quantity <= 1)
+                
+                Text("\(quantity)")
+                    .font(.system(size: 16, weight: .semibold))
+                    .frame(minWidth: 30)
+                
+                Button(action: {
+                    quantity += 1
+                    onQuantityChange(quantity)
+                }) {
+                    Image(systemName: "plus.circle")
+                        .font(.system(size: 20))
+                        .foregroundColor(.primary)
+                }
+                
+                // Кнопка удаления
+                Button(action: onRemove) {
+                    Image(systemName: "trash")
+                        .font(.system(size: 16))
+                        .foregroundColor(.red)
+                }
+                .padding(.top, 4)
+            }
+        }
+        .padding()
+        .background(Color(.systemGray6))
+        .cornerRadius(12)
     }
 }
 

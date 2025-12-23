@@ -16,6 +16,8 @@ struct Product: Codable, Identifiable {
     let image_url: String
     var is_liked: Bool
     let is_bestseller: Bool
+    let category: String?
+    let description: String?
     
     enum CodingKeys: String, CodingKey {
         case brand
@@ -25,6 +27,8 @@ struct Product: Codable, Identifiable {
         case image_url
         case is_liked
         case is_bestseller
+        case category
+        case description
     }
     
     init(from decoder: Decoder) throws {
@@ -37,9 +41,11 @@ struct Product: Codable, Identifiable {
         self.image_url = try container.decode(String.self, forKey: .image_url)
         self.is_liked = try container.decode(Bool.self, forKey: .is_liked)
         self.is_bestseller = try container.decode(Bool.self, forKey: .is_bestseller)
+        self.category = try container.decodeIfPresent(String.self, forKey: .category)
+        self.description = try container.decodeIfPresent(String.self, forKey: .description)
     }
     
-    init(id: UUID = UUID(), brand: String, product_name: String, price: Double, items_left: Int, image_url: String, is_liked: Bool, is_bestseller: Bool) {
+    init(id: UUID = UUID(), brand: String, product_name: String, price: Double, items_left: Int, image_url: String, is_liked: Bool, is_bestseller: Bool, category: String? = nil, description: String? = nil) {
         self.id = id
         self.brand = brand
         self.product_name = product_name
@@ -48,6 +54,8 @@ struct Product: Codable, Identifiable {
         self.image_url = image_url
         self.is_liked = is_liked
         self.is_bestseller = is_bestseller
+        self.category = category
+        self.description = description
     }
     
     var isSoldOut: Bool {

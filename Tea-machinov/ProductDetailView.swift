@@ -133,39 +133,27 @@ struct ProductDetailView: View {
                     Divider()
                         .padding(.vertical, 8)
                     
-                    // Описание (заглушка, так как в модели нет описания)
-                    VStack(alignment: .leading, spacing: 8) {
-                        Text("Описание")
-                            .font(.system(size: 18, weight: .semibold))
-                        
-                        Text("Премиальный продукт от \(product.brand). \(product.product_name) - это качественный товар, который сочетает в себе стиль и функциональность.")
-                            .font(.system(size: 16))
-                            .foregroundColor(.secondary)
-                            .lineSpacing(4)
+                    // Описание
+                    if let description = product.description, !description.isEmpty {
+                        VStack(alignment: .leading, spacing: 8) {
+                            Text("Описание")
+                                .font(.system(size: 18, weight: .semibold))
+                            
+                            Text(description)
+                                .font(.system(size: 16))
+                                .foregroundColor(.secondary)
+                                .lineSpacing(4)
+                        }
+                        .padding(.top, 8)
                     }
-                    .padding(.top, 8)
                 }
                 .padding(.horizontal)
                 
                 // Кнопка добавления в корзину
                 if !product.isSoldOut {
-                    Button(action: {
-                        // Действие добавления в корзину
-                        print("Добавить в корзину: \(product.product_name)")
-                    }) {
-                        HStack {
-                            Spacer()
-                            Text("Добавить в корзину")
-                                .font(.system(size: 18, weight: .semibold))
-                                .foregroundColor(.white)
-                            Spacer()
-                        }
-                        .padding()
-                        .background(Color.black)
-                        .cornerRadius(12)
-                    }
-                    .padding(.horizontal)
-                    .padding(.top, 8)
+                    AddToCartButton(product: product)
+                        .padding(.horizontal)
+                        .padding(.top, 8)
                 } else {
                     Button(action: {}) {
                         HStack {
@@ -193,10 +181,49 @@ struct ProductDetailView: View {
                 Button(action: {
                     dismiss()
                 }) {
-                    Image(systemName: "chevron.left")
-                        .foregroundColor(.primary)
+                    HStack(spacing: 4) {
+                        Image(systemName: "chevron.left")
+                            .font(.system(size: 16, weight: .semibold))
+                            .foregroundColor(.blue)
+                    }
                 }
             }
+        }
+    }
+}
+
+// MARK: - Add to Cart Button
+struct AddToCartButton: View {
+    let product: Product
+    @EnvironmentObject var cartService: CartService
+    @State private var showAddedAlert = false
+    
+    var body: some View {
+        Button(action: {
+            cartService.addProduct(product)
+            showAddedAlert = true
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+                showAddedAlert = false
+            }
+        }) {
+            HStack {
+                Spacer()
+                if showAddedAlert {
+                    HStack(spacing: 8) {
+                        Image(systemName: "checkmark")
+                        Text("Добавлено")
+                    }
+                } else {
+                    Text("Добавить в корзину")
+                }
+                Spacer()
+            }
+            .font(.system(size: 18, weight: .semibold))
+            .foregroundColor(.white)
+            .padding()
+            .background(showAddedAlert ? Color.green : Color.black)
+            .cornerRadius(12)
+            .animation(.easeInOut(duration: 0.2), value: showAddedAlert)
         }
     }
 }
