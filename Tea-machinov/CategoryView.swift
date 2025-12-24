@@ -9,7 +9,7 @@ import SwiftUI
 
 struct CategoryView: View {
     let categoryName: String
-    @ObservedObject var productService: ProductService
+    @EnvironmentObject var productService: ProductService
     @Environment(\.dismiss) var dismiss
     @State private var selectedSubCategory: String = "Socks"
     @State private var showFilters = false
@@ -192,7 +192,7 @@ struct CategoryView: View {
             GridItem(.flexible(), spacing: 12)
         ], spacing: 16) {
             ForEach(products) { product in
-                NavigationLink(destination: ProductDetailView(productId: product.id, productService: productService)) {
+                NavigationLink(destination: ProductDetailView(productId: product.id)) {
                     ProductGridCard(
                         product: product,
                         onLikeToggle: {

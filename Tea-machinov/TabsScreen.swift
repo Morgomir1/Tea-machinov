@@ -10,6 +10,8 @@ import SwiftUI
 struct TabsScreen: View {
     @State private var selectedTab = 0
     @StateObject private var cartService = CartService()
+    @StateObject private var favoritesService = FavoritesService()
+    @StateObject private var productService = ProductService()
     
     var body: some View {
         TabView(selection: $selectedTab) {
@@ -58,14 +60,19 @@ struct TabsScreen: View {
             
             UITabBar.appearance().standardAppearance = appearance
             UITabBar.appearance().scrollEdgeAppearance = appearance
+            
+            // Связываем ProductService с FavoritesService
+            productService.setFavoritesService(favoritesService)
         }
         .environmentObject(cartService)
+        .environmentObject(favoritesService)
+        .environmentObject(productService)
     }
 }
 
 // MARK: - Home View
 struct HomeView: View {
-    @StateObject private var productService = ProductService()
+    @EnvironmentObject var productService: ProductService
     @StateObject private var interestService = InterestService()
     @State private var searchText = ""
     @State private var showAddInterestSheet = false
@@ -131,7 +138,7 @@ struct HomeView: View {
                         ScrollView(.horizontal, showsIndicators: false) {
                             HStack(spacing: 12) {
                                 ForEach(productService.getRecommendedProducts()) { product in
-                                    NavigationLink(destination: ProductDetailView(productId: product.id, productService: productService)) {
+                                    NavigationLink(destination: ProductDetailView(productId: product.id)) {
                                         RecommendedProductCard(
                                             product: product,
                                             onLikeToggle: {
@@ -157,7 +164,7 @@ struct HomeView: View {
 
 // MARK: - Shop View
 struct ShopView: View {
-    @StateObject private var productService = ProductService()
+    @EnvironmentObject var productService: ProductService
     @State private var selectedCategory: String
     let initialCategory: String?
     let showBackButton: Bool
@@ -415,7 +422,7 @@ struct ShopView: View {
                     GridItem(.flexible(), spacing: 12)
                 ], spacing: 16) {
                     ForEach(searchResults) { product in
-                        NavigationLink(destination: ProductDetailView(productId: product.id, productService: productService)) {
+                        NavigationLink(destination: ProductDetailView(productId: product.id)) {
                             ProductGridCard(
                                 product: product,
                                 onLikeToggle: {
@@ -482,7 +489,7 @@ struct ShopView: View {
                                 GridItem(.flexible(), spacing: 12)
                             ], spacing: 16) {
                                 ForEach(categoryProducts) { product in
-                                    NavigationLink(destination: ProductDetailView(productId: product.id, productService: productService)) {
+                                    NavigationLink(destination: ProductDetailView(productId: product.id)) {
                                         ProductGridCard(
                                             product: product,
                                             onLikeToggle: {
@@ -519,7 +526,7 @@ struct ShopView: View {
                         // Две карточки рядом
                         HStack(spacing: 12) {
                             // Карточка "Best Sellers"
-                            NavigationLink(destination: CategoryView(categoryName: "Best Sellers", productService: productService)) {
+                            NavigationLink(destination: CategoryView(categoryName: "Best Sellers")) {
                                 CategoryCard(
                                     title: "Best Sellers",
                                     imageName: "crossovki",
@@ -529,7 +536,7 @@ struct ShopView: View {
                             .buttonStyle(PlainButtonStyle())
                             
                             // Карточка "Featured in Nike Air"
-                            NavigationLink(destination: CategoryView(categoryName: "Featured in Nike Air", productService: productService)) {
+                            NavigationLink(destination: CategoryView(categoryName: "Featured in Nike Air")) {
                                 CategoryCard(
                                     title: "Featured in Nike Air",
                                     imageName: "muzhik1",
@@ -542,7 +549,7 @@ struct ShopView: View {
                         
                         // Дополнительные карточки с изображениями из онбординга
                         HStack(spacing: 12) {
-                            NavigationLink(destination: CategoryView(categoryName: "New Arrivals", productService: productService)) {
+                            NavigationLink(destination: CategoryView(categoryName: "New Arrivals")) {
                                 CategoryCard(
                                     title: "New Arrivals",
                                     imageName: "tetka1",
@@ -551,7 +558,7 @@ struct ShopView: View {
                             }
                             .buttonStyle(PlainButtonStyle())
                             
-                            NavigationLink(destination: CategoryView(categoryName: "Special Offers", productService: productService)) {
+                            NavigationLink(destination: CategoryView(categoryName: "Special Offers")) {
                                 CategoryCard(
                                     title: "Special Offers",
                                     imageName: "tetka2",
@@ -618,7 +625,7 @@ struct ShopView: View {
                                 GridItem(.flexible(), spacing: 12)
                             ], spacing: 16) {
                                 ForEach(bestsellers.prefix(4)) { product in
-                                    NavigationLink(destination: ProductDetailView(productId: product.id, productService: productService)) {
+                                    NavigationLink(destination: ProductDetailView(productId: product.id)) {
                                         ProductGridCard(
                                             product: product,
                                             onLikeToggle: {
@@ -652,7 +659,7 @@ struct ShopView: View {
                     ScrollView(.horizontal, showsIndicators: false) {
                         HStack(spacing: 12) {
                             ForEach(shoesProducts.prefix(4)) { product in
-                                NavigationLink(destination: ProductDetailView(productId: product.id, productService: productService)) {
+                                NavigationLink(destination: ProductDetailView(productId: product.id)) {
                                     RecommendedProductCard(
                                         product: product,
                                         onLikeToggle: {
@@ -787,10 +794,11 @@ struct ProductCard: View {
 
 // MARK: - Favourites View
 struct FavouritesView: View {
-    @StateObject private var productService = ProductService()
+    @EnvironmentObject var productService: ProductService
+    @EnvironmentObject var favoritesService: FavoritesService
     
     var likedProducts: [Product] {
-        productService.products.filter { $0.is_liked }
+        productService.getFavoriteProducts()
     }
     
     var body: some View {
@@ -818,7 +826,7 @@ struct FavouritesView: View {
                         GridItem(.flexible(), spacing: 12)
                     ], spacing: 16) {
                         ForEach(likedProducts) { product in
-                            NavigationLink(destination: ProductDetailView(productId: product.id, productService: productService)) {
+                            NavigationLink(destination: ProductDetailView(productId: product.id)) {
                                 ProductGridCard(
                                     product: product,
                                     onLikeToggle: {
