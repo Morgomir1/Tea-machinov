@@ -30,7 +30,9 @@ struct ContentView: View {
             })
         case .tabs:
             // Основной экран приложения с табами
-            TabsScreen()
+            TabsScreen(goToOnboarding: {
+                currentScreen = .onboarding
+            })
         }
     }
 }
