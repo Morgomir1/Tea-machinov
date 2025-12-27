@@ -1,16 +1,11 @@
-//
-//  AddInterestView.swift
-//  Tea-machinov
-//
-//  Created by user on 04.12.2025.
-//
-
 import SwiftUI
 
+// Модальное окно для добавления новых интересов
 struct AddInterestView: View {
     @ObservedObject var interestService: InterestService
     @Environment(\.dismiss) var dismiss
     
+    // Показываем только те интересы, которые еще не добавлены
     var availableToAdd: [Interest] {
         interestService.availableInterests.filter { interest in
             !interestService.selectedInterests.contains { $0.id == interest.id }
@@ -27,6 +22,7 @@ struct AddInterestView: View {
                         .padding(.top)
                     
                     if availableToAdd.isEmpty {
+                        // Если все интересы уже добавлены - показываем сообщение
                         VStack(spacing: 16) {
                             Image(systemName: "checkmark.circle.fill")
                                 .font(.system(size: 50))
@@ -38,11 +34,13 @@ struct AddInterestView: View {
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 60)
                     } else {
+                        // Сетка доступных интересов 2x2
                         LazyVGrid(columns: [
                             GridItem(.flexible(), spacing: 12),
                             GridItem(.flexible(), spacing: 12)
                         ], spacing: 16) {
                             ForEach(availableToAdd) { interest in
+                                // При нажатии добавляем интерес
                                 Button(action: {
                                     interestService.addInterest(interest)
                                 }) {

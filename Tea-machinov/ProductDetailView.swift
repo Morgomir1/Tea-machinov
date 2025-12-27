@@ -1,19 +1,16 @@
-//
-//  ProductDetailView.swift
-//  Tea-machinov
-//
-//  Created by user on 04.12.2025.
-//
-
 import SwiftUI
 
+// Экран с детальной информацией о товаре
 struct ProductDetailView: View {
+    // ID товара для которого показываем детали
     let productId: UUID
+    // Сервис товаров (получаем из окружения)
     @EnvironmentObject var productService: ProductService
+    // Для закрытия экрана
     @Environment(\.dismiss) var dismiss
     @State private var selectedImageIndex = 0
     
-    // Получаем актуальный товар из productService
+    // Находим товар по ID в списке товаров
     private var product: Product? {
         productService.products.first { $0.id == productId }
     }
@@ -21,30 +18,37 @@ struct ProductDetailView: View {
     var body: some View {
         Group {
             if let product = product {
+                // Если товар найден - показываем детали
                 productDetailContent(for: product)
             } else {
+                // Если не найден - показываем сообщение
                 Text("Товар не найден")
                     .foregroundColor(.secondary)
             }
         }
     }
     
+    // Основной контент экрана деталей товара
     private func productDetailContent(for product: Product) -> some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 20) {
-                // Изображение товара
+                // Изображение товара с кнопкой избранного
                 ZStack(alignment: .topTrailing) {
+                    // Асинхронная загрузка изображения
                     AsyncImage(url: URL(string: product.image_url)) { phase in
                         switch phase {
                         case .empty:
+                            // Пока загружается - показываем индикатор
                             Rectangle()
                                 .fill(Color.gray.opacity(0.2))
                                 .overlay(ProgressView())
                         case .success(let image):
+                            // Изображение загружено - показываем
                             image
                                 .resizable()
                                 .aspectRatio(contentMode: .fit)
                         case .failure:
+                            // Ошибка загрузки - показываем иконку
                             Rectangle()
                                 .fill(Color.gray.opacity(0.2))
                                 .overlay(
@@ -59,7 +63,7 @@ struct ProductDetailView: View {
                     .frame(maxWidth: .infinity)
                     .background(Color(.systemGray6))
                     
-                    // Кнопка избранного
+                    // Кнопка избранного в правом верхнем углу
                     Button(action: {
                         productService.toggleLike(for: product)
                     }) {
@@ -75,7 +79,7 @@ struct ProductDetailView: View {
                 
                 // Информация о товаре
                 VStack(alignment: .leading, spacing: 12) {
-                    // Бейджи
+                    // Бейджи (бестселлер, распродан)
                     HStack(spacing: 8) {
                         if product.is_bestseller {
                             Text("Bestseller")
@@ -103,7 +107,7 @@ struct ProductDetailView: View {
                         .font(.system(size: 18, weight: .medium))
                         .foregroundColor(.secondary)
                     
-                    // Название продукта
+                    // Название товара
                     Text(product.product_name)
                         .font(.system(size: 24, weight: .bold))
                         .foregroundColor(.primary)
@@ -117,7 +121,7 @@ struct ProductDetailView: View {
                     Divider()
                         .padding(.vertical, 8)
                     
-                    // Остаток товара
+                    // Остаток товара в наличии
                     HStack {
                         Text("Осталось в наличии:")
                             .font(.system(size: 16))
@@ -125,6 +129,7 @@ struct ProductDetailView: View {
                         
                         Spacer()
                         
+                        // Показываем количество, зеленым если есть, красным если нет
                         Text("\(product.items_left) шт.")
                             .font(.system(size: 16, weight: .semibold))
                             .foregroundColor(product.items_left > 0 ? .green : .red)
@@ -133,7 +138,7 @@ struct ProductDetailView: View {
                     Divider()
                         .padding(.vertical, 8)
                     
-                    // Описание
+                    // Описание товара (если есть)
                     if let description = product.description, !description.isEmpty {
                         VStack(alignment: .leading, spacing: 8) {
                             Text("Описание")
@@ -149,12 +154,13 @@ struct ProductDetailView: View {
                 }
                 .padding(.horizontal)
                 
-                // Кнопка добавления в корзину
+                // Кнопка добавления в корзину (показываем только если товар в наличии)
                 if !product.isSoldOut {
                     AddToCartButton(product: product)
                         .padding(.horizontal)
                         .padding(.top, 8)
                 } else {
+                    // Если распродан - показываем неактивную кнопку
                     Button(action: {}) {
                         HStack {
                             Spacer()
@@ -177,6 +183,7 @@ struct ProductDetailView: View {
         .navigationBarTitleDisplayMode(.inline)
         .navigationBarBackButtonHidden(true)
         .toolbar {
+            // Кастомная кнопка назад
             ToolbarItem(placement: .navigationBarLeading) {
                 Button(action: {
                     dismiss()
@@ -190,16 +197,19 @@ struct ProductDetailView: View {
     }
 }
 
-// MARK: - Add to Cart Button
+// Кнопка добавления в корзину с анимацией успешного добавления
 struct AddToCartButton: View {
     let product: Product
     @EnvironmentObject var cartService: CartService
+    // Показывать ли сообщение "Добавлено"
     @State private var showAddedAlert = false
     
     var body: some View {
         Button(action: {
+            // Добавляем товар в корзину
             cartService.addProduct(product)
             showAddedAlert = true
+            // Через 1.5 секунды скрываем сообщение
             DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
                 showAddedAlert = false
             }
@@ -207,6 +217,7 @@ struct AddToCartButton: View {
             HStack {
                 Spacer()
                 if showAddedAlert {
+                    // Показываем галочку и текст "Добавлено"
                     HStack(spacing: 8) {
                         Image(systemName: "checkmark")
                         Text("Добавлено")
@@ -219,6 +230,7 @@ struct AddToCartButton: View {
             .font(.system(size: 18, weight: .semibold))
             .foregroundColor(.white)
             .padding()
+            // Меняем цвет на зеленый когда добавлено
             .background(showAddedAlert ? Color.green : Color.black)
             .cornerRadius(12)
             .animation(.easeInOut(duration: 0.2), value: showAddedAlert)

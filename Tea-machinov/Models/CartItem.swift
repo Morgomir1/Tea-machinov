@@ -1,15 +1,12 @@
-//
-//  CartItem.swift
-//  Tea-machinov
-//
-//  Created by user on 04.12.2025.
-//
-
 import Foundation
 
+// Элемент корзины - товар с количеством
 struct CartItem: Identifiable {
+    // Уникальный ID элемента корзины
     let id: UUID
+    // Товар который добавлен в корзину
     let product: Product
+    // Количество этого товара
     var quantity: Int
     
     init(product: Product, quantity: Int = 1) {
@@ -18,10 +15,12 @@ struct CartItem: Identifiable {
         self.quantity = quantity
     }
     
+    // Общая стоимость этого товара (цена * количество)
     var totalPrice: Double {
         product.price * Double(quantity)
     }
     
+    // Форматированная общая стоимость
     var formattedTotalPrice: String {
         String(format: "US$%.2f", totalPrice)
     }

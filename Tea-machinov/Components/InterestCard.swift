@@ -1,18 +1,13 @@
-//
-//  InterestCard.swift
-//  Tea-machinov
-//
-//  Created by user on 04.12.2025.
-//
-
 import SwiftUI
 
+// Карточка интереса пользователя - показывает категорию товаров
 struct InterestCard: View {
     let title: String
     let imageName: String
     
     var body: some View {
         ZStack(alignment: .leading) {
+            // Фоновое изображение
             Image(imageName)
                 .resizable()
                 .aspectRatio(contentMode: .fill)
@@ -20,7 +15,7 @@ struct InterestCard: View {
                 .clipped()
                 .cornerRadius(12)
             
-            // Градиент для лучшей читаемости текста
+            // Градиент снизу для читаемости текста
             LinearGradient(
                 gradient: Gradient(colors: [Color.black.opacity(0.4), Color.clear]),
                 startPoint: .bottom,
@@ -28,6 +23,7 @@ struct InterestCard: View {
             )
             .cornerRadius(12)
             
+            // Название интереса внизу слева
             Text(title)
                 .font(.system(size: 18, weight: .bold))
                 .foregroundColor(.white)

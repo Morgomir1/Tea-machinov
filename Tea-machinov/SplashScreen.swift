@@ -1,19 +1,15 @@
-//
-//  SplashScreen.swift
-//  Tea-machinov
-//
-//  Created by user on 04.12.2025.
-//
-
 import SwiftUI
 
+// Экран заставки при запуске приложения
 struct SplashScreen: View {
+    // Флаг для анимации появления логотипа
     @State private var isAnimating = false
+    // Колбэк который вызывается когда заставка закончилась
     var onFinish: () -> Void
     
     var body: some View {
         ZStack {
-            // Черный фон
+            // Черный фон на весь экран
             Color.black
                 .edgesIgnoringSafeArea(.all)
             
@@ -23,16 +19,17 @@ struct SplashScreen: View {
                 .aspectRatio(contentMode: .fit)
                 .frame(width: 120, height: 120)
                 .colorMultiply(.white)
+                // Плавно появляется и увеличивается
                 .opacity(isAnimating ? 1.0 : 0.0)
                 .scaleEffect(isAnimating ? 1.0 : 0.8)
         }
         .onAppear {
-            // Анимация появления
+            // Запускаем анимацию появления
             withAnimation(.easeInOut(duration: 0.8)) {
                 isAnimating = true
             }
             
-            // Переход к следующему экрану через 2.5 секунды
+            // Через 2.5 секунды переходим на следующий экран
             DispatchQueue.main.asyncAfter(deadline: .now() + 2.5) {
                 onFinish()
             }

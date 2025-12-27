@@ -1,24 +1,22 @@
-//
-//  ProductGridCard.swift
-//  Tea-machinov
-//
-//  Created by user on 04.12.2025.
-//
-
 import SwiftUI
 
+// Карточка товара для сетки (2 колонки)
 struct ProductGridCard: View {
     let product: Product
+    // Колбэк при нажатии на кнопку избранного
     let onLikeToggle: () -> Void
     
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
+            // Изображение товара с кнопкой избранного
             ZStack(alignment: .topTrailing) {
+                // Загружаем изображение асинхронно
                 AsyncImage(url: URL(string: product.image_url)) { image in
                     image
                         .resizable()
                         .aspectRatio(contentMode: .fill)
                 } placeholder: {
+                    // Пока загружается - показываем серый прямоугольник с индикатором
                     Rectangle()
                         .fill(Color.gray.opacity(0.2))
                         .overlay(
@@ -29,7 +27,7 @@ struct ProductGridCard: View {
                 .clipped()
                 .cornerRadius(12)
                 
-                // Иконка избранного
+                // Кнопка избранного в правом верхнем углу
                 Button(action: onLikeToggle) {
                     Image(systemName: product.is_liked ? "heart.fill" : "heart")
                         .foregroundColor(product.is_liked ? .red : .white)
@@ -41,7 +39,7 @@ struct ProductGridCard: View {
                 .padding(8)
             }
             
-            // Бейдж Bestseller или Sold Out
+            // Бейдж бестселлера или распродано
             if product.is_bestseller {
                 Text("Bestseller")
                     .font(.system(size: 10, weight: .semibold))
@@ -60,19 +58,19 @@ struct ProductGridCard: View {
                     .cornerRadius(4)
             }
             
-            // Название бренда
+            // Бренд товара
             Text(product.brand)
                 .font(.system(size: 14, weight: .medium))
                 .foregroundColor(.primary)
                 .lineLimit(1)
             
-            // Название продукта
+            // Название товара
             Text(product.product_name)
                 .font(.system(size: 12))
                 .foregroundColor(.secondary)
                 .lineLimit(2)
             
-            // Количество цветов (извлекаем из названия, если есть)
+            // Если в названии есть информация о количестве цветов - показываем
             if product.product_name.contains("Colour") || product.product_name.contains("Colours") {
                 let colorsText = extractColorsCount(from: product.product_name)
                 if !colorsText.isEmpty {
@@ -82,7 +80,7 @@ struct ProductGridCard: View {
                 }
             }
             
-            // Цена
+            // Цена товара
             Text(product.formattedPrice)
                 .font(.system(size: 14, weight: .semibold))
                 .foregroundColor(.primary)
@@ -90,8 +88,8 @@ struct ProductGridCard: View {
         .frame(maxWidth: .infinity, alignment: .leading)
     }
     
+    // Извлекаем количество цветов из названия товара (например, "3 Colours")
     private func extractColorsCount(from text: String) -> String {
-        // Извлекаем количество цветов из текста типа "3 Colours" или "5 Colours"
         if let range = text.range(of: #"\d+\s+Colou?rs?"#, options: .regularExpression) {
             return String(text[range])
         }

@@ -1,38 +1,36 @@
-//
-//  CategoryView.swift
-//  Tea-machinov
-//
-//  Created by user on 04.12.2025.
-//
-
 import SwiftUI
 
+// Экран категории товаров с подкатегориями и поиском
 struct CategoryView: View {
+    // Название категории (например, "Best Sellers")
     let categoryName: String
     @EnvironmentObject var productService: ProductService
     @Environment(\.dismiss) var dismiss
+    // Выбранная подкатегория
     @State private var selectedSubCategory: String = "Socks"
     @State private var showFilters = false
     @State private var isSearchActive = false
     @State private var searchText = ""
     @FocusState private var isSearchFieldFocused: Bool
     
+    // Доступные подкатегории
     let subCategories = ["Socks", "Accessories & Equipment", "Player", "Training"]
     
+    // Фильтруем товары по категории, поиску и подкатегории
     var filteredProducts: [Product] {
-        // Сначала фильтруем по основной категории
         var products: [Product] = productService.products
+        // Если это категория бестселлеров - берем только их
         if categoryName == "Best Sellers" {
             products = productService.getBestsellers()
         }
         
-        // Фильтруем по поисковому запросу, если есть
+        // Если есть поисковый запрос - фильтруем по нему
         if !searchText.isEmpty {
             let searchResults = productService.searchProducts(query: searchText)
             products = searchResults
         }
         
-        // Затем фильтруем по выбранной подкатегории
+        // Фильтруем по выбранной подкатегории
         let subCategoryFiltered = products.filter { product in
             matchesSubCategory(product: product, subCategory: selectedSubCategory)
         }
@@ -40,6 +38,7 @@ struct CategoryView: View {
         return subCategoryFiltered
     }
     
+    // Проверяем, подходит ли товар под подкатегорию (ищем ключевые слова в названии и бренде)
     private func matchesSubCategory(product: Product, subCategory: String) -> Bool {
         let productName = product.product_name.lowercased()
         let brand = product.brand.lowercased()
@@ -47,10 +46,12 @@ struct CategoryView: View {
         
         switch subCategory {
         case "Socks":
+            // Ищем слова связанные с носками
             return combined.contains("sock") || 
                    combined.contains("носки") ||
                    productName.contains("sock")
         case "Accessories & Equipment":
+            // Ищем аксессуары и оборудование
             return combined.contains("backpack") ||
                    combined.contains("bag") ||
                    combined.contains("equipment") ||
@@ -58,12 +59,14 @@ struct CategoryView: View {
                    combined.contains("аксессуар") ||
                    combined.contains("рюкзак")
         case "Player":
+            // Товары для игроков (баскетбол, Jordan и т.д.)
             return combined.contains("player") ||
                    combined.contains("basketball") ||
                    combined.contains("jordan") ||
                    combined.contains("игрок") ||
                    brand.contains("jordan")
         case "Training":
+            // Товары для тренировок
             return combined.contains("training") ||
                    combined.contains("dri-fit") ||
                    combined.contains("therma") ||
@@ -81,10 +84,8 @@ struct CategoryView: View {
         
         return ScrollView {
             VStack(alignment: .leading, spacing: 20) {
-                // Горизонтальная прокрутка подкатегорий
                 categoryScrollView
                 
-                // Сетка товаров 2x2
                 if hasProducts {
                     productsGrid(products: products)
                 } else {
@@ -109,7 +110,6 @@ struct CategoryView: View {
             
             ToolbarItem(placement: .navigationBarTrailing) {
                 HStack(spacing: 12) {
-                    // Поле поиска, показывается при активации
                     if isSearchActive {
                         TextField("Поиск товаров", text: $searchText)
                             .textFieldStyle(.roundedBorder)
@@ -123,7 +123,6 @@ struct CategoryView: View {
                             }
                     }
                     
-                    // Кнопка поиска
                     Button(action: {
                         withAnimation(.easeInOut(duration: 0.2)) {
                             if isSearchActive {
@@ -139,7 +138,6 @@ struct CategoryView: View {
                             .foregroundColor(.primary)
                     }
                     
-                    // Кнопка фильтра
                     Button(action: {
                         showFilters = true
                     }) {
@@ -153,8 +151,6 @@ struct CategoryView: View {
             FilterView()
         }
     }
-    
-    // MARK: - View Components
     
     private var categoryScrollView: some View {
         ScrollView(.horizontal, showsIndicators: false) {

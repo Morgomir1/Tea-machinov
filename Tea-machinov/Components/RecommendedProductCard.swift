@@ -1,23 +1,20 @@
-//
-//  RecommendedProductCard.swift
-//  Tea-machinov
-//
-//  Created by user on 04.12.2025.
-//
-
 import SwiftUI
 
+// Карточка товара для горизонтального списка рекомендаций (меньше размером)
 struct RecommendedProductCard: View {
     let product: Product
+    // Колбэк при нажатии на избранное
     let onLikeToggle: () -> Void
     
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
+            // Изображение товара
             AsyncImage(url: URL(string: product.image_url)) { image in
                 image
                     .resizable()
                     .aspectRatio(contentMode: .fill)
             } placeholder: {
+                // Плейсхолдер пока загружается
                 Rectangle()
                     .fill(Color.gray.opacity(0.2))
                     .overlay(
@@ -28,7 +25,7 @@ struct RecommendedProductCard: View {
             .clipped()
             .cornerRadius(12)
             .overlay(
-                // Иконка избранного
+                // Кнопка избранного поверх изображения
                 Button(action: onLikeToggle) {
                     Image(systemName: product.is_liked ? "heart.fill" : "heart")
                         .foregroundColor(product.is_liked ? .red : .white)
@@ -41,13 +38,13 @@ struct RecommendedProductCard: View {
                 alignment: .topTrailing
             )
             
-            // Название бренда
+            // Бренд
             Text(product.brand)
                 .font(.system(size: 12, weight: .medium))
                 .foregroundColor(.primary)
                 .lineLimit(1)
             
-            // Название продукта
+            // Название товара
             Text(product.product_name)
                 .font(.system(size: 11))
                 .foregroundColor(.secondary)
@@ -58,7 +55,7 @@ struct RecommendedProductCard: View {
                 .font(.system(size: 13, weight: .semibold))
                 .foregroundColor(.primary)
         }
-        .frame(width: 150)
+        .frame(width: 150) // Фиксированная ширина для горизонтального списка
     }
 }
 

@@ -1,20 +1,17 @@
-//
-//  TabsScreen.swift
-//  Tea-machinov
-//
-//  Created by user on 28.11.2025.
-//
-
 import SwiftUI
 
+// Главный экран с табами - основная навигация приложения
 struct TabsScreen: View {
+    // Какой таб сейчас выбран (0 = Home, 1 = Shop, и т.д.)
     @State private var selectedTab = 0
+    // Сервисы для работы с данными - создаем один раз и передаем дальше
     @StateObject private var cartService = CartService()
     @StateObject private var favoritesService = FavoritesService()
     @StateObject private var productService = ProductService()
     
     var body: some View {
         TabView(selection: $selectedTab) {
+            // Домашний экран
             HomeView()
                 .tabItem {
                     Image(systemName: "house")
@@ -22,6 +19,7 @@ struct TabsScreen: View {
                 }
                 .tag(0)
             
+            // Экран магазина с поиском
             ShopView()
                 .tabItem {
                     Image(systemName: "magnifyingglass")
@@ -29,6 +27,7 @@ struct TabsScreen: View {
                 }
                 .tag(1)
             
+            // Избранные товары
             FavouritesView()
                 .tabItem {
                     Image(systemName: "heart")
@@ -36,6 +35,7 @@ struct TabsScreen: View {
                 }
                 .tag(2)
             
+            // Корзина
             BagView()
                 .tabItem {
                     Image(systemName: "bag")
@@ -43,6 +43,7 @@ struct TabsScreen: View {
                 }
                 .tag(3)
             
+            // Профиль пользователя
             ProfileView()
                 .tabItem {
                     Image(systemName: "person")
@@ -51,9 +52,8 @@ struct TabsScreen: View {
                 .tag(4)
         }
         .accentColor(.blue)
-        // Используем стандартный стиль таб-бара iOS
         .onAppear {
-            // Настройка внешнего вида таб-бара (опционально)
+            // Настраиваем внешний вид таб-бара
             let appearance = UITabBarAppearance()
             appearance.configureWithOpaqueBackground()
             appearance.backgroundColor = UIColor.systemBackground
@@ -61,27 +61,31 @@ struct TabsScreen: View {
             UITabBar.appearance().standardAppearance = appearance
             UITabBar.appearance().scrollEdgeAppearance = appearance
             
-            // Связываем ProductService с FavoritesService
+            // Связываем сервисы между собой для синхронизации избранного
             productService.setFavoritesService(favoritesService)
         }
+        // Передаем сервисы во все дочерние экраны
         .environmentObject(cartService)
         .environmentObject(favoritesService)
         .environmentObject(productService)
     }
 }
 
-// MARK: - Home View
+// Домашний экран с интересами и рекомендациями
 struct HomeView: View {
+    // Сервис для работы с товарами (получаем из родительского экрана)
     @EnvironmentObject var productService: ProductService
+    // Сервис для управления интересами пользователя
     @StateObject private var interestService = InterestService()
     @State private var searchText = ""
+    // Показывать ли модальное окно для добавления интересов
     @State private var showAddInterestSheet = false
     
     var body: some View {
         NavigationView {
             ScrollView {
                 VStack(alignment: .leading, spacing: 24) {
-                    // Секция "Shop My Interests"
+                    // Секция с интересами пользователя
                     VStack(alignment: .leading, spacing: 12) {
                         HStack {
                             Text("Shop My Interests")
@@ -89,6 +93,7 @@ struct HomeView: View {
                             
                             Spacer()
                             
+                            // Кнопка для добавления новых интересов
                             Button("Add Interest") {
                                 showAddInterestSheet = true
                             }
@@ -129,7 +134,6 @@ struct HomeView: View {
                     }
                     .padding(.top, 8)
                     
-                    // Секция "Recommended for You"
                     VStack(alignment: .leading, spacing: 12) {
                         Text("Recommended for You")
                             .font(.system(size: 24, weight: .bold))
@@ -162,7 +166,6 @@ struct HomeView: View {
     }
 }
 
-// MARK: - Shop View
 struct ShopView: View {
     @EnvironmentObject var productService: ProductService
     @State private var selectedCategory: String
@@ -273,14 +276,11 @@ struct ShopView: View {
     var body: some View {
         Group {
             if showBackButton {
-                // Когда открыт через NavigationLink, не создаем новый NavigationView
                 ScrollView {
                     VStack(alignment: .leading, spacing: 20) {
-                        // Если есть поисковый запрос, показываем результаты поиска
                         if !searchText.isEmpty {
                             searchResultsView
                         } else {
-                            // Обычный контент магазина
                             shopContentView
                         }
                     }
@@ -302,7 +302,6 @@ struct ShopView: View {
                     
                     ToolbarItem(placement: .navigationBarTrailing) {
                         HStack(spacing: 12) {
-                            // Поле поиска, показывается при активации
                             if isSearchActive {
                                 TextField("Поиск товаров", text: $searchText)
                                     .textFieldStyle(.roundedBorder)
@@ -310,23 +309,19 @@ struct ShopView: View {
                                     .focused($isSearchFieldFocused)
                                     .transition(.opacity)
                                     .onAppear {
-                                        // Автоматически фокусируем поле при появлении
                                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
                                             isSearchFieldFocused = true
                                         }
                                     }
                             }
                             
-                            // Кнопка поиска
                             Button(action: {
                                 withAnimation(.easeInOut(duration: 0.2)) {
                                     if isSearchActive {
-                                        // Закрываем поиск
                                         isSearchActive = false
                                         searchText = ""
                                         isSearchFieldFocused = false
                                     } else {
-                                        // Открываем поиск
                                         isSearchActive = true
                                     }
                                 }
@@ -338,15 +333,12 @@ struct ShopView: View {
                     }
                 }
             } else {
-                // Когда открыт как вкладка, создаем NavigationView
                 NavigationView {
                     ScrollView {
                         VStack(alignment: .leading, spacing: 20) {
-                            // Если есть поисковый запрос, показываем результаты поиска
                             if !searchText.isEmpty {
                                 searchResultsView
                             } else {
-                                // Обычный контент магазина
                                 shopContentView
                             }
                         }
@@ -357,7 +349,6 @@ struct ShopView: View {
                     .toolbar {
                         ToolbarItem(placement: .navigationBarTrailing) {
                             HStack(spacing: 12) {
-                                // Поле поиска, показывается при активации
                                 if isSearchActive {
                                     TextField("Поиск товаров", text: $searchText)
                                         .textFieldStyle(.roundedBorder)
@@ -365,23 +356,19 @@ struct ShopView: View {
                                         .focused($isSearchFieldFocused)
                                         .transition(.opacity)
                                         .onAppear {
-                                            // Автоматически фокусируем поле при появлении
                                             DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
                                                 isSearchFieldFocused = true
                                             }
                                         }
                                 }
                                 
-                                // Кнопка поиска
                                 Button(action: {
                                     withAnimation(.easeInOut(duration: 0.2)) {
                                         if isSearchActive {
-                                            // Закрываем поиск
                                             isSearchActive = false
                                             searchText = ""
                                             isSearchFieldFocused = false
                                         } else {
-                                            // Открываем поиск
                                             isSearchActive = true
                                         }
                                     }
@@ -398,7 +385,6 @@ struct ShopView: View {
         }
     }
     
-    // MARK: - Search Results View
     private var searchResultsView: some View {
         VStack(alignment: .leading, spacing: 16) {
             Text("Результаты поиска: \"\(searchText)\"")
@@ -438,10 +424,8 @@ struct ShopView: View {
         }
     }
     
-    // MARK: - Shop Content View
     private var shopContentView: some View {
         VStack(alignment: .leading, spacing: 20) {
-                    // Категории как переключаемые табы (скрываем, если показываем только новые товары)
                     if !showNewProductsOnly {
                         VStack(spacing: 0) {
                             HStack(spacing: 0) {
@@ -468,7 +452,6 @@ struct ShopView: View {
                             .padding(.horizontal)
                             .padding(.top, 8)
                             
-                            // Разделительная линия под табами
                             Rectangle()
                                 .fill(Color.gray.opacity(0.2))
                                 .frame(height: 1)
@@ -476,7 +459,6 @@ struct ShopView: View {
                         }
                     }
                     
-                    // Секция с продуктами выбранной категории
                     VStack(alignment: .leading, spacing: 16) {
                         Text(showNewProductsOnly ? "New Collection" : "\(selectedCategory) Collection")
                             .font(.system(size: 24, weight: .bold))
@@ -516,16 +498,13 @@ struct ShopView: View {
                     }
                     .padding(.top, 16)
                     
-                    // Секция "Must-Haves, Best Sellers & More" (скрываем для новых товаров)
                     if !showNewProductsOnly {
                         VStack(alignment: .leading, spacing: 16) {
                         Text("Must-Haves, Best Sellers & More")
                             .font(.system(size: 18, weight: .semibold))
                             .padding(.horizontal)
                         
-                        // Две карточки рядом
                         HStack(spacing: 12) {
-                            // Карточка "Best Sellers"
                             NavigationLink(destination: CategoryView(categoryName: "Best Sellers")) {
                                 CategoryCard(
                                     title: "Best Sellers",
@@ -535,7 +514,6 @@ struct ShopView: View {
                             }
                             .buttonStyle(PlainButtonStyle())
                             
-                            // Карточка "Featured in Nike Air"
                             NavigationLink(destination: CategoryView(categoryName: "Featured in Nike Air")) {
                                 CategoryCard(
                                     title: "Featured in Nike Air",
@@ -547,7 +525,6 @@ struct ShopView: View {
                         }
                         .padding(.horizontal)
                         
-                        // Дополнительные карточки с изображениями из онбординга
                         HStack(spacing: 12) {
                             NavigationLink(destination: CategoryView(categoryName: "New Arrivals")) {
                                 CategoryCard(
@@ -573,7 +550,6 @@ struct ShopView: View {
                     .padding(.top, 8)
                     }
                     
-                    // Баннер "New & Featured" (скрываем для новых товаров)
                     if !showNewProductsOnly {
                         VStack(alignment: .leading, spacing: 12) {
                         BannerCard(
@@ -586,14 +562,12 @@ struct ShopView: View {
                     .padding(.top, 8)
                     }
                     
-                    // Секция "Best Sellers" (скрываем для новых товаров)
                     if !showNewProductsOnly {
                         VStack(alignment: .leading, spacing: 16) {
                         Text("Best Sellers")
                             .font(.system(size: 24, weight: .bold))
                             .padding(.horizontal)
                         
-                        // Горизонтальная прокрутка категорий Best Sellers
                         ScrollView(.horizontal, showsIndicators: false) {
                             HStack(spacing: 20) {
                                 ForEach(bestSellerCategories, id: \.self) { category in
@@ -617,7 +591,6 @@ struct ShopView: View {
                             .padding(.horizontal)
                         }
                         
-                        // Сетка товаров 2x2
                         let bestsellers = filteredBestsellers
                         if !bestsellers.isEmpty {
                             LazyVGrid(columns: [
@@ -642,7 +615,6 @@ struct ShopView: View {
                     .padding(.top, 8)
                     }
                     
-            // Дополнительный контент - секция Shoes (скрываем для новых товаров)
             if !showNewProductsOnly {
                 VStack(alignment: .leading, spacing: 12) {
                 Text("Shoes")
@@ -679,7 +651,6 @@ struct ShopView: View {
     }
 }
 
-// MARK: - Category Card Component
 struct CategoryCard: View {
     let title: String
     let imageName: String
@@ -706,7 +677,6 @@ struct CategoryCard: View {
     }
 }
 
-// MARK: - Banner Card Component
 struct BannerCard: View {
     let title: String
     let imageName: String
@@ -721,7 +691,6 @@ struct BannerCard: View {
                 .clipped()
                 .cornerRadius(12)
             
-            // Градиент для лучшей читаемости текста
             LinearGradient(
                 gradient: Gradient(colors: [Color.black.opacity(0.3), Color.clear]),
                 startPoint: .leading,
@@ -738,7 +707,6 @@ struct BannerCard: View {
     }
 }
 
-// MARK: - Promo Banner Card Component
 struct PromoBannerCard: View {
     let title: String
     let subtitle: String
@@ -754,7 +722,6 @@ struct PromoBannerCard: View {
                 .clipped()
                 .cornerRadius(12)
             
-            // Градиент для лучшей читаемости текста
             LinearGradient(
                 gradient: Gradient(colors: [Color.black.opacity(0.4), Color.clear]),
                 startPoint: .leading,
@@ -776,7 +743,6 @@ struct PromoBannerCard: View {
     }
 }
 
-// MARK: - Product Card Component
 struct ProductCard: View {
     let imageName: String
     
@@ -792,7 +758,6 @@ struct ProductCard: View {
     }
 }
 
-// MARK: - Favourites View
 struct FavouritesView: View {
     @EnvironmentObject var productService: ProductService
     @EnvironmentObject var favoritesService: FavoritesService
@@ -848,7 +813,7 @@ struct FavouritesView: View {
     }
 }
 
-// MARK: - Bag View
+// Экран корзины с товарами
 struct BagView: View {
     @EnvironmentObject var cartService: CartService
     
@@ -856,6 +821,7 @@ struct BagView: View {
         NavigationView {
             VStack(spacing: 0) {
                 if cartService.items.isEmpty {
+                    // Если корзина пуста - показываем сообщение
                     VStack(spacing: 16) {
                         Image(systemName: "bag")
                             .font(.system(size: 60))
@@ -871,15 +837,18 @@ struct BagView: View {
                     }
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
                 } else {
+                    // Список товаров в корзине
                     ScrollView {
                         VStack(spacing: 16) {
                             ForEach(cartService.items) { item in
                                 CartItemRow(
                                     item: item,
                                     onQuantityChange: { newQuantity in
+                                        // Обновляем количество товара
                                         cartService.updateQuantity(for: item.product, quantity: newQuantity)
                                     },
                                     onRemove: {
+                                        // Удаляем товар из корзины
                                         cartService.removeProduct(item.product)
                                     }
                                 )
@@ -888,7 +857,7 @@ struct BagView: View {
                         .padding()
                     }
                     
-                    // Итого и кнопка оформления
+                    // Итого и кнопка оформления заказа
                     VStack(spacing: 12) {
                         HStack {
                             Text("Итого:")
@@ -899,8 +868,8 @@ struct BagView: View {
                         }
                         .padding(.horizontal)
                         
+                        // Кнопка оформления заказа (пока только выводит в консоль)
                         Button(action: {
-                            // Действие оформления заказа
                             print("Оформление заказа на сумму \(cartService.formattedTotalPrice)")
                         }) {
                             HStack {
@@ -928,11 +897,13 @@ struct BagView: View {
     }
 }
 
-// MARK: - Cart Item Row
+// Строка товара в корзине с управлением количеством
 struct CartItemRow: View {
     let item: CartItem
+    // Колбэки для изменения количества и удаления
     let onQuantityChange: (Int) -> Void
     let onRemove: () -> Void
+    // Локальное состояние количества (синхронизируется с item)
     @State private var quantity: Int
     
     init(item: CartItem, onQuantityChange: @escaping (Int) -> Void, onRemove: @escaping () -> Void) {
@@ -973,8 +944,9 @@ struct CartItemRow: View {
             
             Spacer()
             
-            // Управление количеством
+            // Управление количеством и удаление
             VStack(spacing: 8) {
+                // Кнопка уменьшения количества
                 Button(action: {
                     if quantity > 1 {
                         quantity -= 1
@@ -985,12 +957,14 @@ struct CartItemRow: View {
                         .font(.system(size: 20))
                         .foregroundColor(quantity > 1 ? .primary : .secondary)
                 }
-                .disabled(quantity <= 1)
+                .disabled(quantity <= 1) // Нельзя уменьшить меньше 1
                 
+                // Текущее количество
                 Text("\(quantity)")
                     .font(.system(size: 16, weight: .semibold))
                     .frame(minWidth: 30)
                 
+                // Кнопка увеличения количества
                 Button(action: {
                     quantity += 1
                     onQuantityChange(quantity)
@@ -1000,7 +974,7 @@ struct CartItemRow: View {
                         .foregroundColor(.primary)
                 }
                 
-                // Кнопка удаления
+                // Кнопка удаления товара
                 Button(action: onRemove) {
                     Image(systemName: "trash")
                         .font(.system(size: 16))
@@ -1015,7 +989,7 @@ struct CartItemRow: View {
     }
 }
 
-// MARK: - Profile View
+// Экран профиля пользователя (пока заглушка)
 struct ProfileView: View {
     var body: some View {
         NavigationView {

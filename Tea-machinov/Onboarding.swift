@@ -1,25 +1,25 @@
 import SwiftUI
 
+// Экран онбординга - первый экран после регистрации, показывает разные товары
 struct OnboardingScreen: View {
     
+    // Переход на главный экран с табами
     var goToTabs: () -> Void
     
     var body: some View {
         GeometryReader { geometry in
             ZStack {
-                // Фон - темно-серый цвет вместо изображения
+                // Темно-серый фон
                 Color(red: 0.3, green: 0.3, blue: 0.3)
                     .edgesIgnoringSafeArea(.all)
                 
-                // Элемент с картинкой "crossovki" со скрученными краями (сдвинут направо)
                 UIKitImageView()
                     .frame(width: 198, height: 302)
                     .position(
-                        x: 186 + 178/2, // Сдвиг на 20 пунктов направо
+                        x: 186 + 178/2,
                         y: 104 + 302/2
                     )
                 
-                // Новая картинка "tetka1" со скрученными краями
                 Tetka1ImageView()
                     .frame(width: 142, height: 183)
                     .position(
@@ -27,7 +27,6 @@ struct OnboardingScreen: View {
                         y: 223 + 183/2
                     )
                 
-                // Переделанный элемент с картинкой "tetka2"
                 Tetka2ImageView()
                     .frame(width: 154, height: 304)
                     .position(
@@ -35,7 +34,6 @@ struct OnboardingScreen: View {
                         y: 419 + 304/2
                     )
                 
-                // Новый элемент с картинкой "muzhik1"
                 Muzhik1ImageView()
                     .frame(width: 144, height: 203)
                     .position(
@@ -43,7 +41,6 @@ struct OnboardingScreen: View {
                         y: 418 + 203/2
                     )
                 
-                // Новый элемент с картинкой "tetka3"
                 Tetka3ImageView()
                     .frame(width: 209, height: 306)
                     .position(
@@ -51,7 +48,6 @@ struct OnboardingScreen: View {
                         y: 633 + 306/2
                     )
                 
-                // Новый элемент с картинкой "food"
                 FoodImageView()
                     .frame(width: 162, height: 203)
                     .position(
@@ -59,7 +55,6 @@ struct OnboardingScreen: View {
                         y: 418 + 203/2
                     )
                 
-                // Новый элемент с картинкой "crossovki2"
                 Crossovki2ImageView()
                     .frame(width: 199, height: 222)
                     .position(
@@ -67,7 +62,6 @@ struct OnboardingScreen: View {
                         y: 730 + 222/2
                     )
                 
-                // Новый элемент с картинкой "crossovki3"
                 Crossovki3ImageView()
                     .frame(width: 143, height: 210)
                     .position(
@@ -75,7 +69,6 @@ struct OnboardingScreen: View {
                         y: 0 + 210/2
                     )
                 
-                // Новый элемент с картинкой "crossovki4"
                 Crossovki4ImageView()
                     .frame(width: 208, height: 129)
                     .position(
@@ -83,7 +76,7 @@ struct OnboardingScreen: View {
                         y: -33 + 129/2
                     )
                 
-                // ВЕРХНИЙ градиент: черный сверху → прозрачный вниз
+                // Градиент сверху для затемнения
                 LinearGradient(
                     gradient: Gradient(stops: [
                         .init(color: .black.opacity(1.5), location: 0.0),
@@ -94,7 +87,7 @@ struct OnboardingScreen: View {
                 )
                 .edgesIgnoringSafeArea(.all)
                 
-                // НИЖНИЙ градиент: прозрачный в центре → черный снизу
+                // Градиент снизу для затемнения
                 LinearGradient(
                     gradient: Gradient(stops: [
                         .init(color: .black.opacity(0.1), location: 0.5),
@@ -105,11 +98,11 @@ struct OnboardingScreen: View {
                 )
                 .edgesIgnoringSafeArea(.all)
                 
-                // ОБЩЕЕ ЗАТЕМНЕНИЕ всего экрана (менее темное)
+                // Общее затемнение экрана
                 Color.black.opacity(0.2)
                     .edgesIgnoringSafeArea(.all)
                 
-                // Новый текст с атрибутами из UIKit кода
+                // Текст приветствия
                 Text("To personalize your\nexperience and \nconnect you to sport, we've got a few \nquestions for you.")
                     .font(.custom("Inter-SemiBold", size: 30))
                     .foregroundColor(.white)
@@ -122,7 +115,7 @@ struct OnboardingScreen: View {
                         y: 88 + 195/2
                     )
                 
-                // Кнопка Get Started
+                // Кнопка "Get Started" для перехода дальше
                 Button(action: {
                     goToTabs()
                 }) {
@@ -139,7 +132,7 @@ struct OnboardingScreen: View {
                     y: 711 + 24.5
                 )
                 
-                // Индикатор вверху (серый фон)
+                // Индикатор прогресса (серый фон)
                 Rectangle()
                     .fill(Color(red: 0.322, green: 0.314, blue: 0.318))
                     .frame(width: 167, height: 4)
@@ -149,7 +142,7 @@ struct OnboardingScreen: View {
                         y: 54 + 4/2
                     )
                 
-                // Новый элемент - белый индикатор поверх серого
+                // Индикатор прогресса (белая часть)
                 Rectangle()
                     .fill(Color.white)
                     .frame(width: 58, height: 4)
@@ -164,12 +157,13 @@ struct OnboardingScreen: View {
     }
 }
 
-// MARK: - Переделанный Tetka2 Image View
+// UIViewRepresentable для изображения с скрученными краями (используем UIKit для сложных эффектов)
 struct Tetka2ImageView: UIViewRepresentable {
     func makeUIView(context: Context) -> UIView {
         let view = UIView()
         view.frame = CGRect(x: 0, y: 0, width: 154, height: 304)
         
+        // Загружаем изображение и применяем трансформацию
         let image0 = UIImage(named: "tetka2")?.cgImage
         let layer0 = CALayer()
         layer0.contents = image0
@@ -177,14 +171,13 @@ struct Tetka2ImageView: UIViewRepresentable {
         layer0.bounds = view.bounds
         layer0.position = view.center
         
-        // Добавляем скрученные края с помощью маски
+        // Создаем маску со скрученными краями для эффекта "рваных" краев
         let maskLayer = CAShapeLayer()
         let path = UIBezierPath()
         
-        // Создаем путь со скрученными краями
         let width: CGFloat = 154
         let height: CGFloat = 304
-        let curveAmount: CGFloat = 10 // Сила скручивания краев
+        let curveAmount: CGFloat = 10 // Насколько скручиваем края
         
         path.move(to: CGPoint(x: curveAmount, y: 0))
         path.addLine(to: CGPoint(x: width - curveAmount, y: 0))
@@ -202,11 +195,9 @@ struct Tetka2ImageView: UIViewRepresentable {
         
         view.layer.addSublayer(layer0)
         
-        // Добавляем скругление углов (8 пунктов как в оригинальном коде)
         view.layer.cornerRadius = 8
         view.layer.masksToBounds = true
         
-        // Добавляем тень для лучшего визуального эффекта
         view.layer.shadowColor = UIColor.black.cgColor
         view.layer.shadowOffset = CGSize(width: 0, height: 4)
         view.layer.shadowRadius = 6
@@ -216,11 +207,9 @@ struct Tetka2ImageView: UIViewRepresentable {
     }
     
     func updateUIView(_ uiView: UIView, context: Context) {
-        // Обновление view при необходимости
     }
 }
 
-// MARK: - Crossovki4 Image View
 struct Crossovki4ImageView: UIViewRepresentable {
     func makeUIView(context: Context) -> UIView {
         let view = UIView()
@@ -233,14 +222,12 @@ struct Crossovki4ImageView: UIViewRepresentable {
         layer0.bounds = view.bounds
         layer0.position = view.center
         
-        // Добавляем скрученные края с помощью маски (как у других изображений)
         let maskLayer = CAShapeLayer()
         let path = UIBezierPath()
         
-        // Создаем путь со скрученными краями
         let width: CGFloat = 208
         let height: CGFloat = 129
-        let curveAmount: CGFloat = 10 // Сила скручивания краев
+        let curveAmount: CGFloat = 10
         
         path.move(to: CGPoint(x: curveAmount, y: 0))
         path.addLine(to: CGPoint(x: width - curveAmount, y: 0))
@@ -258,11 +245,9 @@ struct Crossovki4ImageView: UIViewRepresentable {
         
         view.layer.addSublayer(layer0)
         
-        // Добавляем скругление углов (8 пунктов как в оригинальном коде)
         view.layer.cornerRadius = 8
         view.layer.masksToBounds = true
         
-        // Добавляем тень для лучшего визуального эффекта (как у других элементов)
         view.layer.shadowColor = UIColor.black.cgColor
         view.layer.shadowOffset = CGSize(width: 0, height: 4)
         view.layer.shadowRadius = 6
@@ -272,11 +257,9 @@ struct Crossovki4ImageView: UIViewRepresentable {
     }
     
     func updateUIView(_ uiView: UIView, context: Context) {
-        // Обновление view при необходимости
     }
 }
 
-// MARK: - Crossovki3 Image View
 struct Crossovki3ImageView: UIViewRepresentable {
     func makeUIView(context: Context) -> UIView {
         let view = UIView()
@@ -296,7 +279,7 @@ struct Crossovki3ImageView: UIViewRepresentable {
         // Создаем путь со скрученными краями
         let width: CGFloat = 143
         let height: CGFloat = 210
-        let curveAmount: CGFloat = 10 // Сила скручивания краев
+        let curveAmount: CGFloat = 10
         
         path.move(to: CGPoint(x: curveAmount, y: 0))
         path.addLine(to: CGPoint(x: width - curveAmount, y: 0))
@@ -314,11 +297,9 @@ struct Crossovki3ImageView: UIViewRepresentable {
         
         view.layer.addSublayer(layer0)
         
-        // Добавляем скругление углов (10 пунктов как в оригинальном коде)
         view.layer.cornerRadius = 10
         view.layer.masksToBounds = true
         
-        // Добавляем тень для лучшего визуального эффекта (как у других элементов)
         view.layer.shadowColor = UIColor.black.cgColor
         view.layer.shadowOffset = CGSize(width: 0, height: 4)
         view.layer.shadowRadius = 6
@@ -328,11 +309,9 @@ struct Crossovki3ImageView: UIViewRepresentable {
     }
     
     func updateUIView(_ uiView: UIView, context: Context) {
-        // Обновление view при необходимости
     }
 }
 
-// MARK: - Crossovki2 Image View
 struct Crossovki2ImageView: UIViewRepresentable {
     func makeUIView(context: Context) -> UIView {
         let view = UIView()
@@ -352,7 +331,7 @@ struct Crossovki2ImageView: UIViewRepresentable {
         // Создаем путь со скрученными краями
         let width: CGFloat = 199
         let height: CGFloat = 222
-        let curveAmount: CGFloat = 12 // Сила скручивания краев
+        let curveAmount: CGFloat = 12
         
         path.move(to: CGPoint(x: curveAmount, y: 0))
         path.addLine(to: CGPoint(x: width - curveAmount, y: 0))
@@ -370,11 +349,9 @@ struct Crossovki2ImageView: UIViewRepresentable {
         
         view.layer.addSublayer(layer0)
         
-        // Добавляем скругление углов (8 пунктов как в оригинальном коде)
         view.layer.cornerRadius = 8
         view.layer.masksToBounds = true
         
-        // Добавляем тень для лучшего визуального эффекта (как у других элементов)
         view.layer.shadowColor = UIColor.black.cgColor
         view.layer.shadowOffset = CGSize(width: 0, height: 4)
         view.layer.shadowRadius = 8
@@ -384,11 +361,9 @@ struct Crossovki2ImageView: UIViewRepresentable {
     }
     
     func updateUIView(_ uiView: UIView, context: Context) {
-        // Обновление view при необходимости
     }
 }
 
-// MARK: - Food Image View
 struct FoodImageView: UIViewRepresentable {
     func makeUIView(context: Context) -> UIView {
         let view = UIView()
@@ -408,7 +383,7 @@ struct FoodImageView: UIViewRepresentable {
         // Создаем путь со скрученными краями
         let width: CGFloat = 162
         let height: CGFloat = 203
-        let curveAmount: CGFloat = 10 // Сила скручивания краев
+        let curveAmount: CGFloat = 10
         
         path.move(to: CGPoint(x: curveAmount, y: 0))
         path.addLine(to: CGPoint(x: width - curveAmount, y: 0))
@@ -426,11 +401,9 @@ struct FoodImageView: UIViewRepresentable {
         
         view.layer.addSublayer(layer0)
         
-        // Добавляем скругление углов (8 пунктов как в оригинальном коде)
         view.layer.cornerRadius = 8
         view.layer.masksToBounds = true
         
-        // Добавляем тень для лучшего визуального эффекта (как у других элементов)
         view.layer.shadowColor = UIColor.black.cgColor
         view.layer.shadowOffset = CGSize(width: 0, height: 4)
         view.layer.shadowRadius = 6
@@ -440,13 +413,9 @@ struct FoodImageView: UIViewRepresentable {
     }
     
     func updateUIView(_ uiView: UIView, context: Context) {
-        // Обновление view при необходимости
     }
 }
 
-// MARK: - Остальные существующие структуры (без изменений)
-
-// UIViewRepresentable для картинки "tetka3" со скрученными краями
 struct Tetka3ImageView: UIViewRepresentable {
     func makeUIView(context: Context) -> UIView {
         let view = UIView()
@@ -460,14 +429,12 @@ struct Tetka3ImageView: UIViewRepresentable {
         layer0.position = view.center
         view.layer.addSublayer(layer0)
         
-        // Добавляем скрученные края с помощью маски
         let maskLayer = CAShapeLayer()
         let path = UIBezierPath()
         
-        // Создаем путь со скрученными краями
         let width: CGFloat = 209
         let height: CGFloat = 306
-        let curveAmount: CGFloat = 12 // Сила скручивания краев
+        let curveAmount: CGFloat = 12
         
         path.move(to: CGPoint(x: curveAmount, y: 0))
         path.addLine(to: CGPoint(x: width - curveAmount, y: 0))
@@ -483,11 +450,9 @@ struct Tetka3ImageView: UIViewRepresentable {
         maskLayer.path = path.cgPath
         layer0.mask = maskLayer
         
-        // Добавляем скругление углов (8 пунктов как в оригинальном коде)
         view.layer.cornerRadius = 8
         view.layer.masksToBounds = true
         
-        // Добавляем тень для лучшего визуального эффекта
         view.layer.shadowColor = UIColor.black.cgColor
         view.layer.shadowOffset = CGSize(width: 0, height: 4)
         view.layer.shadowRadius = 8
@@ -497,11 +462,9 @@ struct Tetka3ImageView: UIViewRepresentable {
     }
     
     func updateUIView(_ uiView: UIView, context: Context) {
-        // Обновление view при необходимости
     }
 }
 
-// UIViewRepresentable для картинки "muzhik1" со скрученными краями
 struct Muzhik1ImageView: UIViewRepresentable {
     func makeUIView(context: Context) -> UIView {
         let view = UIView()
@@ -515,14 +478,12 @@ struct Muzhik1ImageView: UIViewRepresentable {
         layer0.position = view.center
         view.layer.addSublayer(layer0)
         
-        // Добавляем скрученные края с помощью маски
         let maskLayer = CAShapeLayer()
         let path = UIBezierPath()
         
-        // Создаем путь со скрученными краями
         let width: CGFloat = 144
         let height: CGFloat = 203
-        let curveAmount: CGFloat = 10 // Сила скручивания краев
+        let curveAmount: CGFloat = 10
         
         path.move(to: CGPoint(x: curveAmount, y: 0))
         path.addLine(to: CGPoint(x: width - curveAmount, y: 0))
@@ -538,11 +499,9 @@ struct Muzhik1ImageView: UIViewRepresentable {
         maskLayer.path = path.cgPath
         layer0.mask = maskLayer
         
-        // Добавляем скругление углов (8 пунктов как в оригинальном коде)
         view.layer.cornerRadius = 8
         view.layer.masksToBounds = true
         
-        // Добавляем тень для лучшего визуального эффекта
         view.layer.shadowColor = UIColor.black.cgColor
         view.layer.shadowOffset = CGSize(width: 0, height: 4)
         view.layer.shadowRadius = 6
@@ -552,11 +511,9 @@ struct Muzhik1ImageView: UIViewRepresentable {
     }
     
     func updateUIView(_ uiView: UIView, context: Context) {
-        // Обновление view при необходимости
     }
 }
 
-// UIViewRepresentable для картинки "crossovki" со скрученными краями
 struct UIKitImageView: UIViewRepresentable {
     func makeUIView(context: Context) -> UIView {
         let view = UIView()
@@ -569,14 +526,12 @@ struct UIKitImageView: UIViewRepresentable {
         layer0.bounds = view.bounds
         layer0.position = view.center
         
-        // Добавляем скрученные края с помощью маски
         let maskLayer = CAShapeLayer()
         let path = UIBezierPath()
         
-        // Создаем путь со скрученными краями
         let width: CGFloat = 198
         let height: CGFloat = 302
-        let curveAmount: CGFloat = 15 // Сила скручивания краев
+        let curveAmount: CGFloat = 15
         
         path.move(to: CGPoint(x: curveAmount, y: 0))
         path.addLine(to: CGPoint(x: width - curveAmount, y: 0))
@@ -604,11 +559,9 @@ struct UIKitImageView: UIViewRepresentable {
     }
     
     func updateUIView(_ uiView: UIView, context: Context) {
-        // Обновление view при необходимости
     }
 }
 
-// UIViewRepresentable для картинки "tetka1" со скрученными краями
 struct Tetka1ImageView: UIViewRepresentable {
     func makeUIView(context: Context) -> UIView {
         let view = UIView()
@@ -621,14 +574,12 @@ struct Tetka1ImageView: UIViewRepresentable {
         layer0.bounds = view.bounds
         layer0.position = view.center
         
-        // Добавляем скрученные края с помощью маски (как у crossovki)
         let maskLayer = CAShapeLayer()
         let path = UIBezierPath()
         
-        // Создаем путь со скрученными краями
         let width: CGFloat = 142
         let height: CGFloat = 183
-        let curveAmount: CGFloat = 10 // Сила скручивания краев (немного меньше из-за меньшего размера)
+        let curveAmount: CGFloat = 10
         
         path.move(to: CGPoint(x: curveAmount, y: 0))
         path.addLine(to: CGPoint(x: width - curveAmount, y: 0))
@@ -656,7 +607,6 @@ struct Tetka1ImageView: UIViewRepresentable {
     }
     
     func updateUIView(_ uiView: UIView, context: Context) {
-        // Обновление view при необходимости
     }
 }
 
