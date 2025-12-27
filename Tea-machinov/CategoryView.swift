@@ -32,51 +32,12 @@ struct CategoryView: View {
         
         // Фильтруем по выбранной подкатегории
         let subCategoryFiltered = products.filter { product in
-            matchesSubCategory(product: product, subCategory: selectedSubCategory)
+            ProductFilterUtils.matchesSubCategory(product: product, subCategory: selectedSubCategory)
         }
         
         return subCategoryFiltered
     }
     
-    // Проверяем, подходит ли товар под подкатегорию (ищем ключевые слова в названии и бренде)
-    private func matchesSubCategory(product: Product, subCategory: String) -> Bool {
-        let productName = product.product_name.lowercased()
-        let brand = product.brand.lowercased()
-        let combined = "\(productName) \(brand)".lowercased()
-        
-        switch subCategory {
-        case "Socks":
-            // Ищем слова связанные с носками
-            return combined.contains("sock") || 
-                   combined.contains("носки") ||
-                   productName.contains("sock")
-        case "Accessories & Equipment":
-            // Ищем аксессуары и оборудование
-            return combined.contains("backpack") ||
-                   combined.contains("bag") ||
-                   combined.contains("equipment") ||
-                   combined.contains("accessories") ||
-                   combined.contains("аксессуар") ||
-                   combined.contains("рюкзак")
-        case "Player":
-            // Товары для игроков (баскетбол, Jordan и т.д.)
-            return combined.contains("player") ||
-                   combined.contains("basketball") ||
-                   combined.contains("jordan") ||
-                   combined.contains("игрок") ||
-                   brand.contains("jordan")
-        case "Training":
-            // Товары для тренировок
-            return combined.contains("training") ||
-                   combined.contains("dri-fit") ||
-                   combined.contains("therma") ||
-                   combined.contains("трениров") ||
-                   productName.contains("training") ||
-                   productName.contains("Training")
-        default:
-            return true
-        }
-    }
     
     var body: some View {
         let products = filteredProducts
