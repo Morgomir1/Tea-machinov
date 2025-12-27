@@ -4,10 +4,14 @@ import SwiftUI
 struct MainScreen: View {
     // Размер шрифта для заголовка (можно менять если нужно)
     @State private var titleFontSize: CGFloat = 30
+    // Сервис авторизации
+    @ObservedObject var authService: AuthService
     // Переход на экран онбординга
     var goToOnboarding: () -> Void
-    // Переход на экран авторизации
-    var goToSignIn: () -> Void
+    // Переход в приложение после успешной авторизации
+    var onSignInSuccess: () -> Void
+    // Флаг для показа bottom sheet авторизации
+    @State private var showAuthSheet = false
     
     var body: some View {
         GeometryReader { geometry in
@@ -72,7 +76,7 @@ struct MainScreen: View {
                         
                         // Кнопка "Sign In" - прозрачная с белой обводкой
                         Button("Sign In") {
-                            goToSignIn()
+                            showAuthSheet = true
                         }
                         .font(.headline)
                         .foregroundColor(.white)
@@ -89,6 +93,17 @@ struct MainScreen: View {
             }
         }
         .statusBar(hidden: false)
+        .sheet(isPresented: $showAuthSheet) {
+            EmailAuthBottomSheet(
+                authService: authService,
+                onSuccess: {
+                    // После успешной авторизации переходим в приложение
+                    onSignInSuccess()
+                }
+            )
+            .presentationDetents([.large])
+            .presentationDragIndicator(.visible)
+        }
     }
 }
 
@@ -112,10 +127,11 @@ struct RoundedCorner: Shape {
 
 #Preview {
     MainScreen(
+        authService: AuthService(),
         goToOnboarding: {
             
         },
-        goToSignIn: {
+        onSignInSuccess: {
             
         }
     )

@@ -4,6 +4,8 @@ import SwiftUI
 struct ContentView: View {
     // Текущий экран, который показываем пользователю
     @State private var currentScreen: AppScreen = .splash
+    // Сервис авторизации - создаем один раз и передаем во все экраны
+    @StateObject private var authService = AuthService()
     
     // Все возможные экраны в приложении
     enum AppScreen {
@@ -21,16 +23,18 @@ struct ContentView: View {
         case .main:
             // Главный экран с кнопками входа
             MainScreen(
+                authService: authService,
                 goToOnboarding: {
                     currentScreen = .onboarding
                 },
-                goToSignIn: {
-                    currentScreen = .signIn
+                onSignInSuccess: {
+                    currentScreen = .tabs
                 }
             )
         case .signIn:
             // Экран авторизации с вводом email
             EmailAuthView(
+                authService: authService,
                 onSuccess: {
                     currentScreen = .tabs
                 },
@@ -45,9 +49,12 @@ struct ContentView: View {
             })
         case .tabs:
             // Основной экран приложения с табами
-            TabsScreen(goToOnboarding: {
-                currentScreen = .onboarding
-            })
+            TabsScreen(
+                authService: authService,
+                goToOnboarding: {
+                    currentScreen = .onboarding
+                }
+            )
         }
     }
 }

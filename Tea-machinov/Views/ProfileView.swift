@@ -2,12 +2,15 @@ import SwiftUI
 
 // Экран профиля пользователя с заглушкой и кнопками авторизации
 struct ProfileView: View {
+    // Сервис авторизации
+    @ObservedObject var authService: AuthService
     // Callback для перехода на экран авторизации (onboarding)
     var goToOnboarding: (() -> Void)?
     // Флаг для показа bottom sheet авторизации
     @State private var showAuthSheet = false
     
-    init(goToOnboarding: (() -> Void)? = nil) {
+    init(authService: AuthService, goToOnboarding: (() -> Void)? = nil) {
+        self.authService = authService
         self.goToOnboarding = goToOnboarding
     }
     
@@ -29,10 +32,13 @@ struct ProfileView: View {
         }
         .navigationViewStyle(.stack)
         .sheet(isPresented: $showAuthSheet) {
-            EmailAuthBottomSheet(onSuccess: {
-                // После успешной авторизации можно выполнить дополнительные действия
-                // Например, обновить состояние профиля
-            })
+            EmailAuthBottomSheet(
+                authService: authService,
+                onSuccess: {
+                    // После успешной авторизации состояние профиля обновится автоматически
+                    // через @ObservedObject authService
+                }
+            )
             .presentationDetents([.large])
             .presentationDragIndicator(.visible)
         }
@@ -91,19 +97,48 @@ struct ProfileView: View {
     }
     
     private var authButtons: some View {
-        // Кнопка "Sign In" - на всю ширину
-        Button("Sign In") {
-            showAuthSheet = true
+        VStack(spacing: 16) {
+            if authService.isAuthenticated {
+                // Если пользователь авторизован, показываем email и кнопку Log Out
+                VStack(spacing: 12) {
+                    // Email пользователя
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("Signed in as")
+                            .font(.system(size: 14))
+                            .foregroundColor(.gray)
+                        Text(authService.userEmail ?? "")
+                            .font(.system(size: 18, weight: .semibold))
+                            .foregroundColor(.primary)
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    
+                    // Кнопка "Log Out"
+                    Button("Log Out") {
+                        authService.signOut()
+                    }
+                    .font(.headline)
+                    .foregroundColor(.white)
+                    .frame(maxWidth: .infinity)
+                    .frame(height: 50)
+                    .background(Color.black)
+                    .cornerRadius(25)
+                }
+            } else {
+                // Если пользователь не авторизован, показываем кнопку "Sign In"
+                Button("Sign In") {
+                    showAuthSheet = true
+                }
+                .font(.headline)
+                .foregroundColor(.black)
+                .frame(maxWidth: .infinity)
+                .frame(height: 50)
+                .background(Color.clear)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 50)
+                        .stroke(Color.black, lineWidth: 1)
+                )
+            }
         }
-        .font(.headline)
-        .foregroundColor(.black)
-        .frame(maxWidth: .infinity)
-        .frame(height: 50)
-        .background(Color.clear)
-        .overlay(
-            RoundedRectangle(cornerRadius: 50)
-                .stroke(Color.black, lineWidth: 1)
-        )
         .padding(.horizontal, 16)
         .padding(.bottom, 40)
     }

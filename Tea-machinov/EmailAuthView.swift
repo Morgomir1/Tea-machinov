@@ -2,6 +2,8 @@ import SwiftUI
 
 // Экран авторизации с вводом email
 struct EmailAuthView: View {
+    // Сервис авторизации
+    @ObservedObject var authService: AuthService
     // Email адрес пользователя
     @State private var email: String = ""
     // Флаг для отображения ошибки валидации
@@ -93,6 +95,8 @@ struct EmailAuthView: View {
                     // Кнопка продолжения
                     Button(action: {
                         if isValidEmail(email) {
+                            // Сохраняем email в сервисе авторизации
+                            authService.signIn(email: email)
                             // Переходим в приложение
                             onSuccess()
                         } else {
@@ -140,6 +144,7 @@ struct EmailAuthView: View {
 
 #Preview {
     EmailAuthView(
+        authService: AuthService(),
         onSuccess: {
             
         },

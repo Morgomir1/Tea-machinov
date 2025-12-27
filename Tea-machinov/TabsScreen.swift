@@ -8,10 +8,13 @@ struct TabsScreen: View {
     @StateObject private var cartService = CartService()
     @StateObject private var favoritesService = FavoritesService()
     @StateObject private var productService = ProductService()
+    // Сервис авторизации
+    @ObservedObject var authService: AuthService
     // Callback для перехода на экран авторизации
     var goToOnboarding: (() -> Void)?
     
-    init(goToOnboarding: (() -> Void)? = nil) {
+    init(authService: AuthService, goToOnboarding: (() -> Void)? = nil) {
+        self.authService = authService
         self.goToOnboarding = goToOnboarding
     }
     
@@ -50,7 +53,7 @@ struct TabsScreen: View {
                 .tag(3)
             
             // Профиль пользователя
-            ProfileView(goToOnboarding: goToOnboarding)
+            ProfileView(authService: authService, goToOnboarding: goToOnboarding)
                 .tabItem {
                     Image(systemName: "person")
                     Text("Profile")
@@ -78,5 +81,5 @@ struct TabsScreen: View {
 }
 
 #Preview {
-    TabsScreen()
+    TabsScreen(authService: AuthService())
 }

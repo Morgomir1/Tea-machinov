@@ -2,6 +2,8 @@ import SwiftUI
 
 // Bottom sheet версия экрана авторизации с вводом email
 struct EmailAuthBottomSheet: View {
+    // Сервис авторизации
+    @ObservedObject var authService: AuthService
     // Email адрес пользователя
     @State private var email: String = ""
     // Флаг для отображения ошибки валидации
@@ -93,6 +95,8 @@ struct EmailAuthBottomSheet: View {
                     // Кнопка продолжения
                     Button(action: {
                         if isValidEmail(email) {
+                            // Сохраняем email в сервисе авторизации
+                            authService.signIn(email: email)
                             // Закрываем bottom sheet и переходим в приложение
                             dismiss()
                             onSuccess()
@@ -140,8 +144,11 @@ struct EmailAuthBottomSheet: View {
 }
 
 #Preview {
-    EmailAuthBottomSheet(onSuccess: {
-        
-    })
+    EmailAuthBottomSheet(
+        authService: AuthService(),
+        onSuccess: {
+            
+        }
+    )
 }
 
