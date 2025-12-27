@@ -6,6 +6,8 @@ struct MainScreen: View {
     @State private var titleFontSize: CGFloat = 30
     // Переход на экран онбординга
     var goToOnboarding: () -> Void
+    // Переход на экран авторизации
+    var goToSignIn: () -> Void
     
     var body: some View {
         GeometryReader { geometry in
@@ -70,7 +72,7 @@ struct MainScreen: View {
                         
                         // Кнопка "Sign In" - прозрачная с белой обводкой
                         Button("Sign In") {
-                            goToOnboarding()
+                            goToSignIn()
                         }
                         .font(.headline)
                         .foregroundColor(.white)
@@ -109,7 +111,12 @@ struct RoundedCorner: Shape {
 }
 
 #Preview {
-    MainScreen(goToOnboarding: {
-        
-    })
+    MainScreen(
+        goToOnboarding: {
+            
+        },
+        goToSignIn: {
+            
+        }
+    )
 }

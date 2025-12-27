@@ -4,6 +4,8 @@ import SwiftUI
 struct ProfileView: View {
     // Callback для перехода на экран авторизации (onboarding)
     var goToOnboarding: (() -> Void)?
+    // Флаг для показа bottom sheet авторизации
+    @State private var showAuthSheet = false
     
     init(goToOnboarding: (() -> Void)? = nil) {
         self.goToOnboarding = goToOnboarding
@@ -26,6 +28,14 @@ struct ProfileView: View {
             .navigationBarTitleDisplayMode(.large)
         }
         .navigationViewStyle(.stack)
+        .sheet(isPresented: $showAuthSheet) {
+            EmailAuthBottomSheet(onSuccess: {
+                // После успешной авторизации можно выполнить дополнительные действия
+                // Например, обновить состояние профиля
+            })
+            .presentationDetents([.large])
+            .presentationDragIndicator(.visible)
+        }
     }
     
     private func imagesGrid(geometry: GeometryProxy) -> some View {
@@ -81,34 +91,19 @@ struct ProfileView: View {
     }
     
     private var authButtons: some View {
-        HStack(spacing: 16) {
-            // Кнопка "Join Us" - белая с черным текстом
-            Button("Join Us") {
-                goToOnboarding?()
-            }
-            .font(.headline)
-            .foregroundColor(.black)
-            .frame(width: 158, height: 50)
-            .background(Color.white)
-            .cornerRadius(50)
-            .overlay(
-                RoundedRectangle(cornerRadius: 50)
-                    .stroke(Color.black.opacity(0.1), lineWidth: 1)
-            )
-            
-            // Кнопка "Sign In" - прозрачная с черной обводкой
-            Button("Sign In") {
-                goToOnboarding?()
-            }
-            .font(.headline)
-            .foregroundColor(.black)
-            .frame(width: 158, height: 50)
-            .background(Color.clear)
-            .overlay(
-                RoundedRectangle(cornerRadius: 50)
-                    .stroke(Color.black, lineWidth: 1)
-            )
+        // Кнопка "Sign In" - на всю ширину
+        Button("Sign In") {
+            showAuthSheet = true
         }
+        .font(.headline)
+        .foregroundColor(.black)
+        .frame(maxWidth: .infinity)
+        .frame(height: 50)
+        .background(Color.clear)
+        .overlay(
+            RoundedRectangle(cornerRadius: 50)
+                .stroke(Color.black, lineWidth: 1)
+        )
         .padding(.horizontal, 16)
         .padding(.bottom, 40)
     }

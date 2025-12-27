@@ -7,7 +7,7 @@ struct ContentView: View {
     
     // Все возможные экраны в приложении
     enum AppScreen {
-        case splash, main, onboarding, tabs
+        case splash, main, onboarding, tabs, signIn
     }
     
     var body: some View {
@@ -20,9 +20,24 @@ struct ContentView: View {
             })
         case .main:
             // Главный экран с кнопками входа
-            MainScreen(goToOnboarding: {
-                currentScreen = .onboarding
-            })
+            MainScreen(
+                goToOnboarding: {
+                    currentScreen = .onboarding
+                },
+                goToSignIn: {
+                    currentScreen = .signIn
+                }
+            )
+        case .signIn:
+            // Экран авторизации с вводом email
+            EmailAuthView(
+                onSuccess: {
+                    currentScreen = .tabs
+                },
+                onCancel: {
+                    currentScreen = .main
+                }
+            )
         case .onboarding:
             // Экран онбординга для выбора интересов
             OnboardingScreen(goToTabs: {
