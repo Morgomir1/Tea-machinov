@@ -23,13 +23,18 @@ struct EmailAuthBottomSheet: View {
                     .edgesIgnoringSafeArea(.all)
                 
                 VStack(spacing: 0) {
-                    // Логотип Nike
-                    Image("nike_icon")
-                        .resizable()
-                        .aspectRatio(contentMode: .fit)
-                        .frame(width: 80, height: 45)
-                        .padding(.top, 40)
-                        .padding(.bottom, 32)
+                    // Логотип Nike - как на макете (черный swoosh вверху)
+                    HStack {
+                        Spacer()
+                        Image("nike_icon")
+                            .resizable()
+                            .aspectRatio(contentMode: .fit)
+                            .frame(width: 70, height: 40)
+                            .foregroundColor(.black)
+                        Spacer()
+                    }
+                    .padding(.top, 16)
+                    .padding(.bottom, 28)
                     
                     // Заголовок
                     Text("Enter your email to join us or sign in.")
